@@ -19,7 +19,7 @@ if login and email and password:
     try:
         user = auth.sign_in_with_email_and_password(email, password)
         st.session_state['user'] = user
-        st.switch_page("home.py")
+        st.switch_page("app.py")
     except requests.exceptions.HTTPError as e:
         st.error("Invalid email or password!")
 
@@ -41,7 +41,7 @@ if create and newEmail and newUsername and newPassword and confirmPassword:
             db.child("users").child(user["localId"]).child("Username").set(newUsername)
             db.child("users").child(user["localId"]).child("Password").set(newPassword)
             st.session_state['user'] = user
-            st.switch_page("home.py")
+            st.switch_page("app.py")
         except requests.exceptions.HTTPError as e:
             err = e.args[0].response.json()['error']["message"]
             if "INVALID_EMAIL" in err:
