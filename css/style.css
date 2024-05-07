@@ -1,7 +1,10 @@
 section[data-testid='stSidebar'] {
     background-color: #111;
     flex-shrink: unset !important;
-    
+}
+
+.navtab {
+    display: none !important;
 }
 
 @media(hover:hover) and (min-width: 600px) and (max-width: 769px){
@@ -9,7 +12,7 @@ section[data-testid='stSidebar'] {
     header[data-testid="stHeader"] {
         display:none;
     }
-
+W
     section[data-testid='stSidebar'] {
         height: 100%;
         min-width:95px !important;
@@ -19,7 +22,7 @@ section[data-testid='stSidebar'] {
         z-index: 1;
         top: 0;
         left: 0;
-        background-color: #111;
+        background-color: #fff;
         overflow-x: hidden;
         transition: 0.5s ease;
         padding-top: 60px;
