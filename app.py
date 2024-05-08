@@ -43,6 +43,7 @@ def display_sidebar():
 
     elif tabs == 'Scan':
         camera()
+        pass
 
     elif tabs == 'List':
         st.title("List")

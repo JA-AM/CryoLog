@@ -1,5 +1,4 @@
 import streamlit as st # Import python packages
-from snowflake.snowpark.context import get_active_session
 from snowflake.snowpark.session import Session
 
 session = Session.builder.configs(st.secrets['SNOWFLAKE_CONFIG']).create()
