@@ -1,4 +1,4 @@
 .streamlit/secrets.toml
-.venv
 /components/__pycache__
 .gitignore
+.vscode

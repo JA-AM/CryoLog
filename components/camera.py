@@ -4,10 +4,6 @@ import streamlit as st
 import os
 import requests
 
-from dotenv import load_dotenv
-
-load_dotenv()
-
 def get_fooddata_api_token():
     os.environ['FOODDATA_API_KEY'] = st.secrets['FOODDATA_API_KEY']
 
