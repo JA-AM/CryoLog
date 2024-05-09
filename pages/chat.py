@@ -1,5 +1,6 @@
 import streamlit as st # Import python packages
 from snowflake.snowpark.session import Session
+from components.sidebar import sidebar
 
 session = Session.builder.configs(st.secrets['SNOWFLAKE_CONFIG']).create()
 
@@ -88,7 +89,7 @@ for doc in docs_available:
     list_docs.append(doc["name"])
 st.dataframe(list_docs)
 
-model = st.sidebar.selectbox('Select your model:',(
+model = st.selectbox('Select your model:',(
                                            'snowflake-arctic',
                                            'mistral-7b',
                                            'llama2-70b-chat',
@@ -97,7 +98,7 @@ model = st.sidebar.selectbox('Select your model:',(
 
 question = st.text_input("Enter question", placeholder="Is there any special lubricant to be used with the premium bike?", label_visibility="collapsed")
 
-rag = st.sidebar.checkbox('Use your own documents as context?')
+rag = st.checkbox('Use your own documents as context?')
 
 if rag:
     use_rag = 1
@@ -106,3 +107,5 @@ else:
 
 if question:
     display_response(question, model, use_rag)
+
+sidebar(4)
