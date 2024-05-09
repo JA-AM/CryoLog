@@ -1,31 +1,34 @@
 import cv2
 from pyzbar import pyzbar
+import numpy as np
 import streamlit as st
 import os
 import requests
 
-def get_fooddata_api_token():
-    os.environ['FOODDATA_API_KEY'] = st.secrets['FOODDATA_API_KEY']
+from dotenv import load_dotenv
 
-api_key = st.secrets['FOODDATA_API_KEY']
+load_dotenv()
+
+api_key = os.getenv("FOODDATA_API_KEY")  # Replace this with your API key from FoodData Central
 
 # Set to keep track of detected barcodes
 detected_barcodes = set()
 
-# Gets product info from JSON data
 def extract_product_info(data: dict):
     description = data['description']
     ingredients = data.get('ingredients', 'Not available')
     macros = data.get('labelNutrients', {})
     return description, ingredients, macros
 
-# Makes API Call request to USDA API, finds food ID
 def get_product_nutrition(barcode):
+
     url = f"https://api.nal.usda.gov/fdc/v1/foods/search?query={barcode}&api_key={api_key}"
         
     try:
         response = requests.get(url)
         data = response.json()
+        
+        print(data)
         
         if data['foods']:
             food_id = data['foods'][0]['fdcId']
@@ -35,7 +38,6 @@ def get_product_nutrition(barcode):
     except Exception as e:
         return f"Error: {str(e)}"
 
-# Makes API Call request with FoodID to extract info
 def get_nutritional_info(food_id):
     url = f"https://api.nal.usda.gov/fdc/v1/food/{food_id}?api_key={api_key}"
     
@@ -58,14 +60,19 @@ def decode_barcode(frame):
     
     # Detect barcodes in the frame
     barcodes = pyzbar.decode(gray)
-
+    
+    # Loop over detected barcodes
     for barcode in barcodes:
+        # Extract the bounding box location of the barcode
         (x, y, w, h) = barcode.rect
         
+        # Draw a rectangle around the barcode
         cv2.rectangle(frame, (x, y), (x + w, y + h), (255, 0, 0), 2)
         
+        # Convert barcode data to string
         barcode_data = barcode.data.decode("utf-8")
-
+        
+        # Display the barcode data on the frame
         cv2.putText(frame, barcode_data, (x, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 0, 0), 2)
 
         if barcode_data not in detected_barcodes:
@@ -74,16 +81,16 @@ def decode_barcode(frame):
             
             st.write(product_info)
 
-            #TODO Create Add to List Function, Learn More About Ingredients Function
-          
+            # Add barcode to set of detected barcodes
             detected_barcodes.add(barcode_data)
     
     return frame
 
-def camera():
-    st.title("Barcode Scanner")
+# Function to run the barcode detection app
+def run_app():
+    st.title("Barcode Scanner App")
 
-    # Buttons to start and stop camera feed
+    # Button to start camera feed
     start_button = st.button("Start Camera Feed")
     stop_button = st.button("Stop Camera Feed")
 
@@ -114,3 +121,7 @@ def camera():
 
         # Release the capture
         cap.release()
+
+# Run the app
+if __name__ == "__main__":
+    run_app()

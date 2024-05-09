@@ -1,0 +1,6 @@
+streamlit
+streamlit-on-Hover-tabs
+pyrebase4
+opencv-python-headless
+pyzbar
+snowflake-ml-python
