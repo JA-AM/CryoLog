@@ -1,6 +1,0 @@
-streamlit
-streamlit-on-Hover-tabs
-opencv-python-headless
-pyrebase4
-pyzbar
-python-dotenv
