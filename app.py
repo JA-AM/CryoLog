@@ -18,7 +18,7 @@ username =  db.child("users").child(currUser['localId']).get().val()["Username"]
 st.title("Welcome, " + username)
 
 def main():
-    display_header()
+    # display_header()
     display_sidebar()
 
 def display_header():
