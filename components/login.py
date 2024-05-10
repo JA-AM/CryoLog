@@ -41,6 +41,8 @@ def login():
                 user = auth.create_user_with_email_and_password(newEmail, newPassword)
                 db.child("users").child(user["localId"]).child("Username").set(newUsername)
                 db.child("users").child(user["localId"]).child("Password").set(newPassword)
+                db.child("users").child(user["localId"]).child("Conditions").set([None])
+                db.child("users").child(user["localId"]).child("Preferences").set([None])
                 st.session_state['user'] = user
                 st.switch_page("app.py")
             except requests.exceptions.HTTPError as e:
