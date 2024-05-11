@@ -1,6 +1,7 @@
 streamlit
 streamlit-on-Hover-tabs
 pyrebase4
-opencv-python-headless
+opencv-python
 pyzbar
 snowflake-ml-python
+streamlit-tags
