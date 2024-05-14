@@ -28,7 +28,7 @@ def profile(auth, db):
                     'Osteoporosis', 'Irritable Bowel Syndrome', 'Gout'],
         maxtags = 20,
         key='cond')
-        if st.button('Submit', key='condsub'):
+        if st.button('Save', key='condsub'):
             db.child("users").child(currUser["localId"]).child("Conditions").set(conditions)
 
         preferences = st_tags(
@@ -40,5 +40,5 @@ def profile(auth, db):
                     'Chips', 'Fried Foods', 'Boba'],
         maxtags = 20,
         key='pref')
-        if st.button('Submit', key='prefsub'):
+        if st.button('Save', key='prefsub'):
             db.child("users").child(currUser["localId"]).child("Preferences").set(preferences)
