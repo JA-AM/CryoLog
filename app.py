@@ -4,6 +4,7 @@ import pyrebase
 from components.profile import profile
 from components.chat import chat
 from components.list import search
+from components.login import login
 #from components.camera import camera
 from st_on_hover_tabs import on_hover_tabs
 import time
@@ -26,10 +27,6 @@ def firebase_setup():
     
     return auth, db
 
-def is_logged_in():
-    return 'user' in st.session_state
-
-
 def display_header():
     st.header("C R Y O L O G")
 
@@ -39,16 +36,15 @@ def display_sidebar(auth, db, cookie_manager):
                             iconName=["home", 'personrounded', 'camera', "listrounded", "assistantsharp"], 
                             default_choice=cookie_manager.get("tabs_save"))
 
-    if not is_logged_in():
-        st.write(tabs)
-        profile(auth, db, cookie_manager)
+    if 'user' not in st.session_state:
+        login(auth, db, cookie_manager)
     
     elif tabs =='Home':
         cookie_manager.set("tabs_save", 0)
 
     elif tabs == 'Profile':
         cookie_manager.set("tabs_save", 1)
-        profile(auth, db, cookie_manager)
+        profile(db, cookie_manager)
     
     elif tabs == 'Scan':
         cookie_manager.set("tabs_save", 2)

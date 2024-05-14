@@ -13,8 +13,9 @@ def login(auth, db, cookie_manager):
     if login and email and password:
         try:
             user = auth.sign_in_with_email_and_password(email, password)
-            #st.session_state['user'] = user
+            st.session_state['user'] = user
             cookie_manager.set("session_state_save", user)
+            st.rerun
         except requests.exceptions.HTTPError as e:
             st.error("Invalid email or password!")
     
