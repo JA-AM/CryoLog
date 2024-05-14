@@ -5,7 +5,8 @@ def search_food(query):
     url = "https://api.nal.usda.gov/fdc/v1/foods/search"
     params = {
         "api_key": st.secrets['FOODDATA_API_KEY'],
-        "query": query
+        "query": query,
+        "limit": 10,
     }
     response = requests.get(url, params=params)
     if response.status_code == 200:
@@ -15,25 +16,23 @@ def search_food(query):
         return None
 
 def search():
+    selections=[]
     st.title("FoodData Search App")
-
-    with st.form(key='search_form'):
-        search_query = st.text_input("Enter a food item to search:")
-        submitted = st.form_submit_button("Search")
-        
-        if submitted:
-            query = search_query.strip()
-            if query:
-                foods = search_food(query)
-                
-                if foods:
-                    st.write(f"Found {len(foods)} results for '{query}':")
-                    for food in foods:
-                        st.write(f"- {food['description']}")
-                else:
-                    st.write("No results found.")
-            else:
-                st.write("Please enter a search query.")
+    search_query = st.text_input("Enter a food item to search:")
+    
+    if search_query:
+        query = search_query.strip()
+        if query:
+            foods = search_food(query)
+            selection = st.multiselect(f"Found {len(foods)} results for '{query}':", [food['description'] for food in foods])
+            if st.button("Submit", key="foodsbtn"):
+                selections.extend(selection)
+                st.write(selections)
+                search_query = None
+        else:
+            st.write("No results found.")
+    else:
+        st.write("Please enter a search query.")
 
 if __name__ == "__main__":
     search()
