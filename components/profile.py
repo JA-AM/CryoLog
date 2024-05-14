@@ -40,4 +40,6 @@ def profile(db, cookie_manager):
         db.child("users").child(currUser["localId"]).child("Preferences").set(preferences)
     if st.button('Log Out', key='logoutbtn'):
         cookie_manager.remove("session_state_save")
+        del st.session_state['user']
+        st.switch_page("app.py")
         # TODO make sure it reloads and moves to home

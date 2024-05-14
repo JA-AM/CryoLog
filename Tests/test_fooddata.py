@@ -1,13 +1,10 @@
 import cv2
+import streamlit as st
 from pyzbar import pyzbar
 import requests
 import os
 
-from dotenv import load_dotenv
-
-load_dotenv()
-
-api_key = os.getenv("FOODDATA_API_KEY")  # Replace this with your API key from FoodData Central
+api_key = st.secrets["FOODDATA_API_KEY"]  # Replace this with your API key from FoodData Central
 
 def extract_product_info(data):
     description = data['description']
@@ -38,6 +35,7 @@ def get_nutritional_info(food_id):
         data = response.json()
         
         if 'description' in data and 'foodNutrients' in data:
+            print(data)
             description, ingredients, macros = extract_product_info(data)
             return f"Description: {description}\nIngredients: {ingredients}\nMacros: {macros}"
         else:
@@ -48,4 +46,4 @@ def get_nutritional_info(food_id):
 if __name__ == "__main__":
     barcode = "0022000159335"  # Replace this with your actual barcode number
     product_nutrition = get_product_nutrition(barcode)
-    print(product_nutrition)
+    #print(product_nutrition)
