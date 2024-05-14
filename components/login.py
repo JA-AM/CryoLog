@@ -2,13 +2,7 @@ import streamlit as st
 import pyrebase
 import requests
 
-config = st.secrets['firebaseConfig']
-
-firebase = pyrebase.initialize_app(config)
-auth = firebase.auth()
-db = firebase.database()
-
-def login():
+def login(auth, db):
     st.header("Login Page")
 
     st.subheader("Login to Existing Account")

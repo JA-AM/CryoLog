@@ -1,20 +1,57 @@
 import streamlit as st
 import pyrebase
-from components.login import login
-from components.sidebar import sidebar
+from components.profile import profile
+from components.chat import chat
+from components.list import search
+#from components.camera import camera
+from st_on_hover_tabs import on_hover_tabs
 
-st.set_page_config(layout="wide")
+def firebase_setup():
+    config = st.secrets["firebaseConfig"]
+    firebase = pyrebase.initialize_app(config)
+    auth = firebase.auth()
+    db = firebase.database()
+    
+    return auth, db
 
-config = st.secrets["firebaseConfig"]
-firebase = pyrebase.initialize_app(config)
-db = firebase.database()
+def is_logged_in():
+    return 'user' in st.session_state
 
-if 'user' in st.session_state:
-    currUser = st.session_state['user']
-    username =  db.child("users").child(currUser['localId']).get().val()["Username"]
-    st.title("Welcome, " + username)
+def display_header():
+    st.set_page_config(layout="wide")
+    st.header("C R Y O L O G")
 
-st.header("C R Y O L O G")
-st.title("Home")
+def display_sidebar(auth, db):
+    st.markdown('<style>' + open('./css/style.css').read() + '</style>', unsafe_allow_html=True)
 
-sidebar(0)
+    with st.sidebar:
+        tabs = on_hover_tabs(tabName=['Home', 'Profile', 'Scan', 'List', 'Chat'], 
+                            iconName=["home", 'personrounded', 'camera', "listrounded", "assistantsharp"], default_choice=0)
+
+    if not is_logged_in():
+        st.write(tabs)
+        profile(auth, db)
+    
+    elif tabs =='Home':
+        pass
+
+    elif tabs == 'Profile':
+        profile(auth, db)
+    
+    elif tabs == 'Scan':
+        #camera()
+        pass
+
+    elif tabs == 'List':
+        search()
+    
+    elif tabs == 'Chat':
+        chat()
+
+def main():
+    auth, db = firebase_setup()
+    display_header()
+    display_sidebar(auth, db)
+
+if __name__ == '__main__':
+    main()

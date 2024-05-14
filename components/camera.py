@@ -4,9 +4,6 @@ import streamlit as st
 import os
 import requests
 
-def get_fooddata_api_token():
-    os.environ['FOODDATA_API_KEY'] = st.secrets['FOODDATA_API_KEY']
-
 api_key = st.secrets['FOODDATA_API_KEY']
 
 # Set to keep track of detected barcodes
@@ -114,3 +111,6 @@ def camera():
 
         # Release the capture
         cap.release()
+
+if __name__ == "__main__":
+    camera()
