@@ -2,9 +2,9 @@ import streamlit as st
 from streamlit_tags import st_tags
 from components.login import login
 
-def profile(auth, db):
+def profile(auth, db, cookie_manager):
     if 'user' not in st.session_state:
-        login(auth, db)
+        login(auth, db, cookie_manager)
 
     else:
         currUser = st.session_state['user']

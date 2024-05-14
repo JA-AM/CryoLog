@@ -1,10 +1,8 @@
 import streamlit as st
 from streamlit_cookies_controller import CookieController
-import pyrebase
 import requests
 
-def login(auth, db):
-    cookie_manager = CookieController()
+def login(auth, db, cookie_manager):
     st.header("Login Page")
 
     st.subheader("Login to Existing Account")
@@ -16,7 +14,7 @@ def login(auth, db):
         try:
             user = auth.sign_in_with_email_and_password(email, password)
             #st.session_state['user'] = user
-            cookie_manager.set("session_state", user)
+            cookie_manager.set("session_state_save", user)
         except requests.exceptions.HTTPError as e:
             st.error("Invalid email or password!")
 
@@ -39,7 +37,7 @@ def login(auth, db):
                 db.child("users").child(user["localId"]).child("Password").set(newPassword)
 
                 #st.session_state['user'] = user
-                cookie_manager.set("session_state", user)
+                cookie_manager.set("session_state_save", user)
             except requests.exceptions.HTTPError as e:
                 err = e.args[0].response.json()['error']["message"]
                 if "INVALID_EMAIL" in err:

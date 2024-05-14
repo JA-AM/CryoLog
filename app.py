@@ -9,9 +9,9 @@ from st_on_hover_tabs import on_hover_tabs
 
 st.set_page_config(layout="wide")
 
-def get_state_from_cookie():
-    cookie_manager = CookieController()
-    st.session_state['user'] = cookie_manager.get("session_state")
+def get_state_from_cookie(cookie_manager):
+    if cookie_manager.get("session_state_save"):
+        st.session_state['user'] = cookie_manager.get("session_state_save")
 
 def firebase_setup():
     config = st.secrets["firebaseConfig"]
@@ -27,7 +27,7 @@ def is_logged_in():
 def display_header():
     st.header("C R Y O L O G")
 
-def display_sidebar(auth, db):
+def display_sidebar(auth, db, cookie_manager):
     st.markdown('<style>' + open('./css/style.css').read() + '</style>', unsafe_allow_html=True)
 
     with st.sidebar:
@@ -36,13 +36,13 @@ def display_sidebar(auth, db):
 
     if not is_logged_in():
         st.write(tabs)
-        profile(auth, db)
+        profile(auth, db, cookie_manager)
     
     elif tabs =='Home':
         pass
 
     elif tabs == 'Profile':
-        profile(auth, db)
+        profile(auth, db, cookie_manager)
     
     elif tabs == 'Scan':
         #camera()
@@ -56,9 +56,10 @@ def display_sidebar(auth, db):
 
 def main():
     auth, db = firebase_setup()
-    get_state_from_cookie()
+    cookie_manager = CookieController()
+    get_state_from_cookie(cookie_manager)
     display_header()
-    display_sidebar(auth, db)
+    display_sidebar(auth, db, cookie_manager)
 
 if __name__ == '__main__':
     main()
