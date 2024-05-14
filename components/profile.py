@@ -42,3 +42,6 @@ def profile(auth, db, cookie_manager):
         key='pref')
         if st.button('Save', key='prefsub'):
             db.child("users").child(currUser["localId"]).child("Preferences").set(preferences)
+        if st.button('Log Out', key='logoutbtn'):
+            cookie_manager.remove("session_state_save")
+            # TODO make sure it reloads and moves to home

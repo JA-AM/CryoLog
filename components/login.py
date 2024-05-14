@@ -2,12 +2,13 @@ import streamlit as st
 import requests
 
 def login(auth, db, cookie_manager):
-    st.header("Login Page")
-
-    st.subheader("Login to Existing Account")
-    email = st.text_input("Email")
-    password = st.text_input("Password", type="password")
-    login = st.button("Login")
+    col1, col2 = st.columns([1,1])
+    with col2:
+        login_form = st.form("Login to Existing Account")
+        login_form.subheader("Login")
+        email = login_form.text_input("Email")
+        password = login_form.text_input("Password", type="password")
+        login = login_form.form_submit_button("Login")
 
     if login and email and password:
         try:
@@ -16,15 +17,15 @@ def login(auth, db, cookie_manager):
             cookie_manager.set("session_state_save", user)
         except requests.exceptions.HTTPError as e:
             st.error("Invalid email or password!")
-
-    st.subheader("OR")
-
-    st.subheader("Create New Account")
-    newEmail = st.text_input("Email", key="new_email")
-    newUsername = st.text_input("Username")
-    newPassword = st.text_input("Password", key="new_password", type="password")
-    confirmPassword = st.text_input("Confirm password", type="password")
-    create = st.button("Create Account")
+    
+    with col1:
+        signup_form = st.form("Sign Up")
+        signup_form.subheader("Create New Account")
+        newEmail = signup_form.text_input("Email", key="new_email")
+        newUsername = signup_form.text_input("Username")
+        newPassword = signup_form.text_input("Password", key="new_password", type="password")
+        confirmPassword = signup_form.text_input("Confirm password", type="password")
+        create = signup_form.form_submit_button("Create Account")
 
     if create and newEmail and newUsername and newPassword and confirmPassword:
         if newPassword!=confirmPassword:
