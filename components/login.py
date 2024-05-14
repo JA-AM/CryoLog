@@ -49,5 +49,3 @@ def login(auth, db):
                     st.error("Weak password: Password should be at least 6 characters")
                 else:
                     st.error(err)
-
-

@@ -13,7 +13,7 @@
 		  ]
 		}
 	},
-	"updateContentCommand": "pip install -r requirements.txt && sudo apt-get update && sudo apt-get install libzbar-dev -y",
+	"updateContentCommand": "pip install -r requirements.txt && sudo apt-get update && sudo apt-get install libzbar-dev libgl1 -y",
 	"postAttachCommand": {
 		"server": "streamlit run app.py --server.enableCORS false --server.enableXsrfProtection false"
 	},
