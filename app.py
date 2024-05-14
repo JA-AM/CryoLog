@@ -34,7 +34,7 @@ def display_sidebar(auth, db, cookie_manager):
         tabs = on_hover_tabs(tabName=['Home', 'Profile', 'Scan', 'List', 'Chat'], 
                             iconName=["home", 'personrounded', 'camera', "listrounded", "assistantsharp"], default_choice=0)
 
-    if not is_logged_in():
+    if not is_logged_in() and cookie_manager.getAll():
         st.write(tabs)
         profile(auth, db, cookie_manager)
     
