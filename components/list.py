@@ -31,16 +31,17 @@ def search(auth, db):
         if query:
             foods = search_food(query)
             selection = st.multiselect(f"Found {len(foods)} results for '{query}':", [food['description'] for food in foods])
-            if st.button("Submit", on_click=clear, key='foodsendbtn'):
+            if st.button("Add To List", key='foodsendbtn'):
                 userFoods.extend(selection)
+                db.child("users").child(currUser["localId"]).child("Foods").set(userFoods)
         else:
             st.write("No results found.")
     else:
         st.write("Please enter a search query.")
     
-    newFoodList = st.multiselect("USER FOODS", userFoods)
-    if st.button("Submit", on_click=st.write("Done!"), key='foodlistbtn'):
-        db.child("users").child(currUser["localId"]).child("Foods").set(newFoodList)
+    userFoods = st.multiselect("USER FOODS", options=userFoods, default=userFoods)
+    if st.button("Save", key='foodlistbtn'):
+        db.child("users").child(currUser["localId"]).child("Foods").set(userFoods)
 
 if __name__ == "__main__":
     search()
