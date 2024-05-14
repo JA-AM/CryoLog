@@ -1,8 +1,10 @@
 import streamlit as st
+from streamlit_cookies_controller import CookieController
 import pyrebase
 import requests
 
 def login(auth, db):
+    cookie_manager = CookieController()
     st.header("Login Page")
 
     st.subheader("Login to Existing Account")
@@ -13,8 +15,8 @@ def login(auth, db):
     if login and email and password:
         try:
             user = auth.sign_in_with_email_and_password(email, password)
-            st.session_state['user'] = user
-            st.switch_page("app.py")
+            #st.session_state['user'] = user
+            cookie_manager.set("session_state", user)
         except requests.exceptions.HTTPError as e:
             st.error("Invalid email or password!")
 
@@ -35,11 +37,9 @@ def login(auth, db):
                 user = auth.create_user_with_email_and_password(newEmail, newPassword)
                 db.child("users").child(user["localId"]).child("Username").set(newUsername)
                 db.child("users").child(user["localId"]).child("Password").set(newPassword)
-                db.child("users").child(user["localId"]).child("Conditions").set([None])
-                db.child("users").child(user["localId"]).child("Preferences").set([None])
-                db.child("users").child(user["localId"]).child("Foods").set([None])
-                st.session_state['user'] = user
-                st.switch_page("app.py")
+
+                #st.session_state['user'] = user
+                cookie_manager.set("session_state", user)
             except requests.exceptions.HTTPError as e:
                 err = e.args[0].response.json()['error']["message"]
                 if "INVALID_EMAIL" in err:
