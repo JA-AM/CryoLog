@@ -22,6 +22,7 @@ def profile(auth, db):
         label='# Enter Conditions:',
         text='Press enter to add more',
         value=preset_conditions,
+        # TODO change VVV these to a database of health conditions
         suggestions=['Obesity', 'Hypertension', 'Diabetes', 
                     'Hyperlipidemia', 'Acid Reflux', 'Gallstones', 
                     'Osteoporosis', 'Irritable Bowel Syndrome', 'Gout'],

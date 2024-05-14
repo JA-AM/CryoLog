@@ -37,6 +37,7 @@ def login(auth, db):
                 db.child("users").child(user["localId"]).child("Password").set(newPassword)
                 db.child("users").child(user["localId"]).child("Conditions").set([None])
                 db.child("users").child(user["localId"]).child("Preferences").set([None])
+                db.child("users").child(user["localId"]).child("Foods").set([None])
                 st.session_state['user'] = user
                 st.switch_page("app.py")
             except requests.exceptions.HTTPError as e:

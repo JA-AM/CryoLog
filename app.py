@@ -43,7 +43,7 @@ def display_sidebar(auth, db):
         pass
 
     elif tabs == 'List':
-        search()
+        search(auth, db)
     
     elif tabs == 'Chat':
         chat()
