@@ -6,4 +6,4 @@ pyzbar
 snowflake-ml-python
 streamlit-tags
 twilio
-extra-streamlit-components
+streamlit_cookies_controller
