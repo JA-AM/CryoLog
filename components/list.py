@@ -24,7 +24,7 @@ def search(db):
     userFoods = user_data['Foods'] if 'Foods' in user_data else []
 
     st.subheader("FoodData Search App")
-    col1, col2, col3 = st.columns([2,4,1])
+    col1, col2 = st.columns([1,2])
     with col1:
         search_query = st.text_input("Food Search:", key="search_input")
         
@@ -32,13 +32,13 @@ def search(db):
             query = search_query.strip()
             if query:
                 foods = search_food(query)
-
-                selection = st.multiselect(f"Found {len(foods)} results for '{query}':", \
+                placeholder = st.empty()
+                selection = placeholder.multiselect(f"Found {len(foods)} results for '{query}':", \
                                            [f"{food['description']}  \nBrand: {food.get('brandOwner', 'N/A')}  \nFDCID: {food['fdcId']}" for food in foods])
                 if st.button("Add To List", key='foodsendbtn'):
                     userFoods.extend(selection)
                     db.child("users").child(currUser["localId"]).child("Foods").set(userFoods)
-                    #TODO empty food search
+                    placeholder.empty()
             else:
                 st.write("No results found.")
         else:
@@ -54,9 +54,6 @@ def search(db):
                     print(userFoods)
                     db.child("users").child(currUser["localId"]).child("Foods").set(userFoods)
                     st.switch_page('app.py')
-    with col3:
-        if st.button("Save", key='foodlistbtn'):
-            db.child("users").child(currUser["localId"]).child("Foods").set(userFoods)
 
 if __name__ == "__main__":
     search()
