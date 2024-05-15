@@ -10,7 +10,7 @@ def extract_product_info(data: dict):
     # Removes MADE OF: in the beginning, and text in parenthesis
     product_info['ingredients'] = re.sub(r"\([^)]+\)|[*]", "", data.get('ingredients', 'N/A')).lower()
 
-    product_info['labelNutrients'] = {macro: value_dict['value'] for macro, value_dict in data.get('labelNutrients', {}).items()}
+    product_info['labelNutrients'] = {macro: value_dict['value'] for macro, value_dict in data.get('labelNutrients', {'none': {'value': 'none'}}).items()}
     
     return product_info
 
