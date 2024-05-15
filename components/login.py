@@ -1,7 +1,9 @@
 import streamlit as st
 import requests
+from streamlit.components.v1 import html
 
 def login(auth, db, cookie_manager):
+    auth_url = auth.authenticate_login_with_google()
     col1, col2 = st.columns([1,1])
     with col2:
         login_form = st.form("Login to Existing Account")
@@ -36,6 +38,7 @@ def login(auth, db, cookie_manager):
                 user = auth.create_user_with_email_and_password(newEmail, newPassword)
                 db.child("users").child(user["localId"]).child("Username").set(newUsername)
                 db.child("users").child(user["localId"]).child("Password").set(newPassword)
+                db.child("users").child(user["localId"]).child("Email").set(newEmail)
 
                 st.session_state['user'] = user
                 cookie_manager.set("session_state_save", user)
@@ -50,3 +53,31 @@ def login(auth, db, cookie_manager):
                     st.error("Weak password: Password should be at least 6 characters")
                 else:
                     st.error(err)
+
+    def handle_google_request():
+        nav_script = """
+        <meta http-equiv="refresh" content="0; url='%s'">
+        """ % (auth_url)
+        st.write(nav_script, unsafe_allow_html=True)
+
+    st.title("Sign in with Google")
+    st.button("Sign in", on_click=handle_google_request)
+
+    if len(st.query_params)>4:
+        try:
+            url = "https://localhost:8501/?"
+            for key in st.query_params:
+                url+=key+"="+st.query_params[key]+"&"
+            url = url[:-1]
+            user = auth.sign_in_with_oauth_credential(url)
+            db.child("users").child(user["localId"]).child("Email").set(user['email'])
+            cookie_manager.set("session_state_save", user)
+            st.query_params.clear()
+            st.switch_page("app.py")
+        except requests.exceptions.HTTPError as e:
+            st.error("Something went wrong. Please try again.")
+        
+    
+
+
+

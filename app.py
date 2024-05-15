@@ -1,6 +1,6 @@
 import streamlit as st
 from streamlit_cookies_controller import CookieController
-import pyrebase
+import firebase
 from components.profile import profile
 from components.chat import chat
 from components.list import search
@@ -8,6 +8,7 @@ from components.login import login
 from components.camera import camera
 from st_on_hover_tabs import on_hover_tabs
 import time
+
 
 st.set_page_config(layout="wide")
 st.markdown('<style>' + open('./css/style.css').read() + '</style>', unsafe_allow_html=True)
@@ -28,9 +29,14 @@ def get_default_tab_from_cookie(cookie_manager):
 
 def firebase_setup():
     config = st.secrets["firebaseConfig"]
-    firebase = pyrebase.initialize_app(config)
-    auth = firebase.auth()
-    db = firebase.database()
+    client_config = {
+        "client_id": st.secrets["client_id"],
+        "client_secret": st.secrets["client_secret"],
+        "redirect_uris": [st.secrets["redirect_uris"]],
+    }
+    app = firebase.initialize_app(config)
+    auth = app.auth(client_secret=client_config)
+    db = app.database()
     
     return auth, db
 
