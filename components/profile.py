@@ -4,7 +4,11 @@ from components.login import login
 
 def profile(db, cookie_manager):
     currUser = st.session_state['user']
-    username =  db.child("users").child(currUser['localId']).get().val()["Username"]
+    if "Username" in db.child("users").child(currUser['localId']).get().val():
+        username =  db.child("users").child(currUser['localId']).get().val()["Username"]
+    else:        
+        username =  db.child("users").child(currUser['localId']).get().val()["Email"]
+        username = username.split("@")[0]
     st.title("Welcome, " + username)
     
     st.write('member')

@@ -7,3 +7,4 @@ snowflake-ml-python
 streamlit-tags
 twilio
 streamlit_cookies_controller
+firebase-rest-api
