@@ -45,11 +45,11 @@ def display_header():
 
 def display_sidebar(auth, db, cookie_manager, default_tab):
     with st.sidebar:
-        tabs = on_hover_tabs(tabName=['Home', 'Profile', 'Scan', 'List', 'Chat'], 
+        tabs = on_hover_tabs(tabName=['Home', 'Profile', 'Scan', 'My List', 'Chat'], 
                             iconName=["home", 'personrounded', 'camera', "listrounded", "assistantsharp"], 
                             default_choice=default_tab)
     
-    cookie_manager.set("tabs_save", ['Home', 'Profile', 'Scan', 'List', 'Chat'].index(tabs))
+    cookie_manager.set("tabs_save", ['Home', 'Profile', 'Scan', 'My List', 'Chat'].index(tabs))
     
     if 'user' not in st.session_state:
         login(auth, db, cookie_manager)
@@ -61,10 +61,9 @@ def display_sidebar(auth, db, cookie_manager, default_tab):
         profile(db, cookie_manager)
     
     elif tabs == 'Scan':
-        camera()
-        pass
+        camera(db)
 
-    elif tabs == 'List':
+    elif tabs == 'My List':
         search(db)
     
     elif tabs == 'Chat':

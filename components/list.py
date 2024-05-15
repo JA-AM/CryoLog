@@ -1,23 +1,21 @@
 import streamlit as st
-from components.food_search import get_nutritional_info
-import requests
-
-def search_food(query):
-    url = "https://api.nal.usda.gov/fdc/v1/foods/search"
-    params = {
-        "api_key": st.secrets['FOODDATA_API_KEY'],
-        "query": query,
-        "limit": 10,
-    }
-    response = requests.get(url, params=params)
-    if response.status_code == 200:
-        data = response.json()
-        return data["foods"][:10]
-    else:
-        return None
+from components.food_search import get_nutritional_info, search_food
 
 def clear():
     st.session_state.search_input = ""
+
+def show_list(db, currUser, userFoods):
+    for i, food in enumerate(userFoods):
+        with st.popover(f"{food['description']}({food['brandName']})"):
+            st.markdown(f"Food Category: {food['brandedFoodCategory']}")
+            st.markdown(f"FDC ID: {food['fdcId']}")
+            st.markdown(f"Ingredients: {food['ingredients']}")
+            with st.expander("Label Nutrients", expanded=False):
+                st.write(food['labelNutrients'])
+            if st.button("Delete", key=i): 
+                del userFoods[i] 
+                db.child("users").child(currUser["localId"]).child("Foods").set(userFoods)
+                st.switch_page('app.py')
 
 def search(db):
     currUser = st.session_state['user']
@@ -33,7 +31,7 @@ def search(db):
                 placeholder_search = st.empty()
                 placeholder_btn = st.empty()
                 selections = placeholder_search.multiselect(f"Found {len(foods)} results for '{query}':", \
-                                            [f"{food['description']}  Brand: {food.get('brandOwner', 'N/A')}  FDCID: {food['fdcId']}" for food in foods])
+                                            [f"{food['description'].title()}, {food.get('brandOwner', 'N/A')}, FDCID: {food['fdcId']}" for food in foods])
                 if placeholder_btn.button("Add To List", key='foodsendbtn'):
                     for selection in selections:
                         id = selection.split(" ")[-1]
@@ -47,18 +45,8 @@ def search(db):
                 st.write("No results found.")
         else:
             st.write("Please enter a search query.")
-
-    for i, food in enumerate(userFoods):
-        with st.popover(f"{food['description']}({food['brandName']})"):
-            st.markdown(f"Food Category: {food['brandedFoodCategory']}")
-            st.markdown(f"FDC ID: {food['fdcId']}")
-            st.markdown(f"Ingredients: {food['ingredients']}")
-            with st.expander("Label Nutrients", expanded=False):
-                st.write(food['labelNutrients'])
-            if st.button("Delete", key=i): 
-                del userFoods[i] 
-                db.child("users").child(currUser["localId"]).child("Foods").set(userFoods)
-                st.switch_page('app.py')
+    
+    show_list(db, currUser, userFoods)
 
 if __name__ == "__main__":
     search()
