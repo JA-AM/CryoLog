@@ -1,4 +1,5 @@
 import streamlit as st
+from components.food_search import get_nutritional_info
 import requests
 
 def search_food(query):
@@ -33,10 +34,14 @@ def search(db):
             if query:
                 foods = search_food(query)
                 placeholder = st.empty()
-                selection = placeholder.multiselect(f"Found {len(foods)} results for '{query}':", \
-                                           [f"{food['description']}  \nBrand: {food.get('brandOwner', 'N/A')}  \nFDCID: {food['fdcId']}" for food in foods])
+                selections = placeholder.multiselect(f"Found {len(foods)} results for '{query}':", \
+                                           [f"{food['description']}  Brand: {food.get('brandOwner', 'N/A')}  FDCID: {food['fdcId']}" for food in foods])
                 if st.button("Add To List", key='foodsendbtn'):
-                    userFoods.extend(selection)
+                    for selection in selections:
+                        id = selection.split(" ")[-1]
+                        nutritional_info = get_nutritional_info(id)
+                        userFoods.append(nutritional_info)
+                    
                     db.child("users").child(currUser["localId"]).child("Foods").set(userFoods)
                     placeholder.empty()
             else:
@@ -46,12 +51,14 @@ def search(db):
     
     with col2:
         for i, food in enumerate(userFoods):
-            with st.popover(food):
-                st.markdown(food)
+            with st.popover(f"{food['description']}({food['brandName']})"):
+                st.markdown(f"Food Category: {food['brandedFoodCategory']}")
+                st.markdown(f"FDC ID: {food['fdcId']}")
+                st.markdown(f"Ingredients: {food['ingredients']}")
+                with st.expander("Label Nutrients", expanded=False):
+                    st.write(food['labelNutrients'])
                 if st.button("Delete", key=i): 
-                    print(userFoods)
                     del userFoods[i] 
-                    print(userFoods)
                     db.child("users").child(currUser["localId"]).child("Foods").set(userFoods)
                     st.switch_page('app.py')
 

@@ -5,7 +5,7 @@ from components.profile import profile
 from components.chat import chat
 from components.list import search
 from components.login import login
-#from components.camera import camera
+from components.camera import camera
 from st_on_hover_tabs import on_hover_tabs
 import time
 
@@ -55,7 +55,7 @@ def display_sidebar(auth, db, cookie_manager, default_tab):
         profile(db, cookie_manager)
     
     elif tabs == 'Scan':
-        #camera()
+        camera()
         pass
 
     elif tabs == 'List':
