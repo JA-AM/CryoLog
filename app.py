@@ -5,7 +5,7 @@ from components.profile import profile
 from components.chat import chat
 from components.list import search
 from components.login import login
-#from components.camera import camera
+from components.camera import camera
 from st_on_hover_tabs import on_hover_tabs
 import time
 
@@ -19,10 +19,9 @@ def get_state_from_cookie(cookie_manager):
     if cookie_manager.get("session_state_save"):
         st.session_state['user'] = cookie_manager.get("session_state_save")
 
-@st.cache_resource
-def get_default_tab_from_cookie(_cookie_manager):
-    if "prev_saved_tab" not in st.session_state and _cookie_manager.getAll():
-        default_tab = _cookie_manager.get("tabs_save") if _cookie_manager.get("tabs_save") else 0
+def get_default_tab_from_cookie(cookie_manager):
+    if "prev_saved_tab" not in st.session_state and cookie_manager.getAll():
+        default_tab = cookie_manager.get("tabs_save") if cookie_manager.get("tabs_save") else 0
         st.session_state['prev_saved_tab'] = default_tab
         return default_tab
     else:
@@ -48,7 +47,7 @@ def display_sidebar(auth, db, cookie_manager, default_tab):
     with st.sidebar:
         tabs = on_hover_tabs(tabName=['Home', 'Profile', 'Scan', 'List', 'Chat'], 
                             iconName=["home", 'personrounded', 'camera', "listrounded", "assistantsharp"], 
-                            default_choice=0)
+                            default_choice=default_tab)
     
     cookie_manager.set("tabs_save", ['Home', 'Profile', 'Scan', 'List', 'Chat'].index(tabs))
     
@@ -56,17 +55,17 @@ def display_sidebar(auth, db, cookie_manager, default_tab):
         login(auth, db, cookie_manager)
     
     elif tabs =='Home':
-        pass
+        st.title('Home')
 
     elif tabs == 'Profile':
         profile(db, cookie_manager)
     
     elif tabs == 'Scan':
-        #camera()
+        camera()
         pass
 
     elif tabs == 'List':
-        search(auth, db)
+        search(db)
     
     elif tabs == 'Chat':
         chat()

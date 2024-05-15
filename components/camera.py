@@ -1,22 +1,16 @@
+from streamlit_webrtc import WebRtcMode, webrtc_streamer
+from twilio.rest import Client
 import cv2
-from pyzbar import pyzbar
+from pyzbar.pyzbar import decode
+import av
 import streamlit as st
-import os
 import requests
+from components.food_search import get_nutritional_info
 
 api_key = st.secrets['FOODDATA_API_KEY']
 
-# Set to keep track of detected barcodes
 detected_barcodes = set()
 
-# Gets product info from JSON data
-def extract_product_info(data: dict):
-    description = data['description']
-    ingredients = data.get('ingredients', 'Not available')
-    macros = data.get('labelNutrients', {})
-    return description, ingredients, macros
-
-# Makes API Call request to USDA API, finds food ID
 def get_product_nutrition(barcode):
     url = f"https://api.nal.usda.gov/fdc/v1/foods/search?query={barcode}&api_key={api_key}"
         
@@ -32,85 +26,52 @@ def get_product_nutrition(barcode):
     except Exception as e:
         return f"Error: {str(e)}"
 
-# Makes API Call request with FoodID to extract info
-def get_nutritional_info(food_id):
-    url = f"https://api.nal.usda.gov/fdc/v1/food/{food_id}?api_key={api_key}"
-    
-    try:
-        response = requests.get(url)
-        data = response.json()
-        
-        if 'description' in data and 'foodNutrients' in data:
-            description, ingredients, macros = extract_product_info(data)
-            return f"Description: {description}\nIngredients: {ingredients}\nMacros: {macros}"
-        else:
-            return "Nutritional information not available"
-    except Exception as e:
-        return f"Error: {str(e)}"
+def callback(frame: av.VideoFrame) -> av.VideoFrame:
+    img = frame.to_ndarray(format="bgr24")
 
-# Function to decode barcode and highlight it in the frame
-def decode_barcode(frame):
-    # Convert frame to grayscale
-    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-    
-    # Detect barcodes in the frame
-    barcodes = pyzbar.decode(gray)
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
-    for barcode in barcodes:
-        (x, y, w, h) = barcode.rect
-        
-        cv2.rectangle(frame, (x, y), (x + w, y + h), (255, 0, 0), 2)
-        
-        barcode_data = barcode.data.decode("utf-8")
+    barcodes = decode(gray)
 
-        cv2.putText(frame, barcode_data, (x, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 0, 0), 2)
+    if barcodes:
+        for barcode in barcodes:
+            barcode_data = barcode.data.decode('utf-8')
 
-        if barcode_data not in detected_barcodes:
-            # Get product information based on the barcode
-            product_info = get_product_nutrition(barcode_data)
+            (x, y, w, h) = barcode.rect
+
+            cv2.rectangle(img, (x, y), (x + w, y + h), (0, 255, 0), 2)
             
-            st.write(product_info)
+            if barcode_data not in detected_barcodes:
+                print(f"Found barcode: {barcode_data}")
 
-            #TODO Create Add to List Function, Learn More About Ingredients Function
-          
-            detected_barcodes.add(barcode_data)
-    
-    return frame
+                product_info = get_product_nutrition(barcode_data)
+                
+                print(product_info)
+                #st.write(product_info['description'])
+
+                #TODO Create Add to List Function, Learn More About Ingredients Function
+            
+                detected_barcodes.add(barcode_data)
+
+    return av.VideoFrame.from_ndarray(img, format="bgr24")
 
 def camera():
     st.title("Barcode Scanner")
 
-    # Buttons to start and stop camera feed
-    start_button = st.button("Start Camera Feed")
-    stop_button = st.button("Stop Camera Feed")
+    account_sid = st.secrets['TWILIO_ACCOUNT_SID']
+    auth_token = st.secrets['TWILIO_AUTH_TOKEN']
+    client = Client(account_sid, auth_token)
 
-    if start_button:
-        # Create a VideoCapture object
-        cap = cv2.VideoCapture(0)
-
-        # Display live video feed
-        video_placeholder = st.empty()
-
-        while cap.isOpened():
-            # Capture frame-by-frame
-            ret, frame = cap.read()
-
-            # If the frame was not captured successfully, break the loop
-            if not ret:
-                break
-
-            # Call the function to decode barcodes
-            frame = decode_barcode(frame)
-
-            # Display the resulting frame
-            video_placeholder.image(frame, channels="BGR")
-
-            # Check if the stop button is clicked
-            if stop_button:
-                break
-
-        # Release the capture
-        cap.release()
+    token = client.tokens.create()
+    
+    webrtc_streamer(
+        key="opencv-filter",
+        mode=WebRtcMode.SENDRECV,
+        rtc_configuration={"iceServers": token.ice_servers},
+        video_frame_callback=callback,
+        media_stream_constraints={"video": True, "audio": False},
+        async_processing=True
+    )
 
 if __name__ == "__main__":
     camera()

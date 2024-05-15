@@ -40,10 +40,9 @@ def login(auth, db, cookie_manager):
                 db.child("users").child(user["localId"]).child("Password").set(newPassword)
                 db.child("users").child(user["localId"]).child("Email").set(newEmail)
 
-                #st.session_state['user'] = user
+                st.session_state['user'] = user
                 cookie_manager.set("session_state_save", user)
                 st.switch_page("app.py")
-
             except requests.exceptions.HTTPError as e:
                 err = e.args[0].response.json()['error']["message"]
                 if "INVALID_EMAIL" in err:
