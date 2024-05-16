@@ -4,7 +4,7 @@ import cv2
 from pyzbar.pyzbar import decode
 import av
 import streamlit as st
-from components.food_search import get_nutritional_info_barcode
+from components.list_items import display_items
 
 def get_barcode_set() -> set:
     if 'detected_barcodes' not in st.session_state:
@@ -19,10 +19,10 @@ def callback(frame: av.VideoFrame) -> av.VideoFrame:
 
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
-    font = cv2.FONT_HERSHEY_SIMPLEX  # Font for text overlay
-    font_scale = 0.5  # Adjust font size as needed
-    font_thickness = 2  # Adjust text thickness as needed
-    text_color = (0, 255, 0)  # Text color (green)
+    font = cv2.FONT_HERSHEY_SIMPLEX
+    font_scale = 0.5
+    font_thickness = 2
+    text_color = (0, 255, 0)
 
     barcodes = decode(gray)
 
@@ -50,31 +50,6 @@ def callback(frame: av.VideoFrame) -> av.VideoFrame:
 
     return av.VideoFrame.from_ndarray(img, format="bgr24")
 
-def display_scanned_items(db):
-    currUser = st.session_state['user']
-    user_data = db.child("users").child(currUser["localId"]).get().val()
-    userFoods = user_data['Foods'] if 'Foods' in user_data else []
-
-    st.subheader("Scanned Items")
-
-    for i, barcode_data in enumerate(detected_barcodes):
-        product_info = get_nutritional_info_barcode(barcode_data)
-        if product_info is None:
-            st.toast(f"No Information For Barcode: {barcode_data}")
-            continue
-        with st.popover(f"{product_info['description']}({product_info['brandName']})"):
-            st.markdown(f"Food Category: {product_info['brandedFoodCategory']}")
-            st.markdown(f"FDC ID: {product_info['fdcId']}")
-            st.markdown(f"Ingredients: {product_info['ingredients']}")
-            
-            with st.expander("Label Nutrients", expanded=False):
-                st.write(product_info['labelNutrients'])
-            
-            if st.button("Add to List", key=i):
-                st.toast(f"Added {product_info['description']} to My List", icon="✅") 
-                userFoods.append(product_info)
-                db.child("users").child(currUser["localId"]).child("Foods").set(userFoods)
-
 def camera(db):
     st.title("Barcode Scanner")
 
@@ -97,7 +72,8 @@ def camera(db):
     )
 
     if not webrtc_ctx.state.playing:
-        display_scanned_items(db)
+        st.subheader("Scanned Items")
+        display_items(db, detected_barcodes, is_barcode=True)
 
 if __name__ == "__main__":
     camera()

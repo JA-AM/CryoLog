@@ -67,7 +67,7 @@ def display_sidebar(auth, db, cookie_manager, default_tab):
         search(db)
     
     elif tabs == 'Chat':
-        chat()
+        chat(db)
 
 def main():
     cookie_manager = CookieController()
