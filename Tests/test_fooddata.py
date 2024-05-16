@@ -28,14 +28,24 @@ def get_product_nutrition(barcode):
         return f"Error: {str(e)}"
 
 def get_nutritional_info(food_id):
-    url = f"https://api.nal.usda.gov/fdc/v1/food/{food_id}?api_key={api_key}"
-    
+    url = f"https://api.nal.usda.gov/fdc/v1/food/{food_id}"
+    params = {
+        'api_key': api_key,
+        'format': 'abridged',
+        'nutrients': '203,204,205,208,269,291,303,307,601'
+    }
     try:
-        response = requests.get(url)
+        response = requests.get(url, params=params)
         data = response.json()
+        print(data)
         
         if 'description' in data and 'foodNutrients' in data:
-            print(data)
+            for foodNutrient in data['foodNutrients']:
+                print(foodNutrient)
+                #print(foodNutrient['nutrient']['name'])
+                #print(foodNutrient['nutrient']['unitName'])
+                #print(foodNutrient['amount'])
+
             description, ingredients, macros = extract_product_info(data)
             return f"Description: {description}\nIngredients: {ingredients}\nMacros: {macros}"
         else:
@@ -45,5 +55,5 @@ def get_nutritional_info(food_id):
 
 if __name__ == "__main__":
     barcode = "0022000159335"  # Replace this with your actual barcode number
-    product_nutrition = get_product_nutrition(barcode)
+    product_nutrition = get_nutritional_info("356554")
     #print(product_nutrition)

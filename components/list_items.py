@@ -41,9 +41,10 @@ def display_items(db, items_list, is_barcode=False, is_remove=False):
                         res_text = response[0].RESPONSE
                         st.markdown(res_text)
             
-            with st.expander("Label Nutrients", expanded=False):
-                extract_keys = ['carbohydrates', 'fat', 'protein']
-                macros = {key: item['labelNutrients'][key] for key in extract_keys if key in item['labelNutrients']}
+            nutrient_key = 'labelNutrients' if 'labelNutrients' in item else 'foodNutrients'
+            with st.expander("Nutrient Information", expanded=False):
+                extract_keys = ['carbohydrates', 'fat', 'protein', 'total lipid (fat)', 'carbohydrate, by difference']
+                macros = {key: item[nutrient_key][key] for key in extract_keys if key in item[nutrient_key]}
                 # other_values = sum(value for key, value in food['labelNutrients'].items() if key not in extract_keys)
                 # macros['other'] = other_values
                 data = {'Macros ': list(macros.keys()), 'Value ': list(macros.values())}
@@ -52,10 +53,10 @@ def display_items(db, items_list, is_barcode=False, is_remove=False):
                 # fig = px.pie(data, names='Components ', values='Value ', title='Nutrients')
                 st.plotly_chart(fig, use_container_width=True)
                 st.write('All Nutritional Information')
-                st.json(item['labelNutrients'], expanded=False)
-                st.write(product_info['labelNutrients'])
+                st.json(item[nutrient_key], expanded=False)
             
-            num_items = st.number_input("Number of Items to Add", 1, 10, key=str(i)+"num")
+            if not is_remove:
+                num_items = st.number_input("Number of Items to Add", 1, 10, key=str(i)+"num")
 
             if not is_remove and st.button("Add to List", key=i):
                 st.toast(f"Added {num_items} {product_info['description']} to My List", icon="✅") 

@@ -22,7 +22,7 @@ def extract_product_info(data: dict):
     keys = ["description", "brandedFoodCategory", "brandName"]
     product_info = {key: data.get(key, "N/A").title() for key in keys}
     
-    product_info['fdcId'] = data.get("fdcId", "none")
+    product_info['fdcId'] = data.get("fdcId", "None")
 
     ingredients_list = data.get('ingredients', 'N/A')
     ingredients_list = re.sub(r"\([^)]+\)|[*]", "", ingredients_list)
@@ -31,17 +31,22 @@ def extract_product_info(data: dict):
 
     product_info['ingredients'] = ingredients_list
 
-    product_info['labelNutrients'] = {macro: value_dict['value'] for macro, value_dict in data.get('labelNutrients', {'none': {'value': 'none'}}).items()}
-    
+    if 'labelNutrients' in data:
+        product_info['labelNutrients'] = {macro: value_dict['value'] for macro, value_dict in data['labelNutrients'].items()}
+    else:
+        product_info['foodNutrients'] = {foodNutrient['nutrient']['name'].lower(): foodNutrient['amount'] for foodNutrient in data['foodNutrients']}
+
     return product_info
 
 def get_nutritional_info(food_id):
-    url = f"https://api.nal.usda.gov/fdc/v1/food/{food_id}?api_key={api_key}"
-    
+    url = f"https://api.nal.usda.gov/fdc/v1/food/{food_id}"
+    params = {
+        'api_key': api_key,
+        'nutrients': '203,204,205,208,269,291,303,307,601'
+    }
     try:
-        response = requests.get(url)
+        response = requests.get(url, params=params)
         data = response.json()
-        
         if 'description' in data and 'foodNutrients' in data:
             return extract_product_info(data)
         else:
