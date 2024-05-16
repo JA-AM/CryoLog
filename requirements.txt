@@ -9,3 +9,5 @@ twilio
 streamlit_cookies_controller
 firebase-rest-api
 streamlit_webrtc
+markdown
+plotly

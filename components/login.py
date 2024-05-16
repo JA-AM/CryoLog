@@ -6,6 +6,13 @@ from streamlit.components.v1 import html
 def login(auth, db, cookie_manager):
     auth_url = auth.authenticate_login_with_google()
     col1, col2 = st.columns([1,1])
+
+    def handle_google_request():
+        nav_script = """
+        <meta http-equiv="refresh" content="0; url='%s'">
+        """ % (auth_url)
+        st.write(nav_script, unsafe_allow_html=True)
+
     with col2:
         login_form = st.form("Login to Existing Account")
         login_form.subheader("Login")
@@ -18,6 +25,9 @@ def login(auth, db, cookie_manager):
         email_for_reset = reset_form.text_input("Email", key="reset_email")
         reset = reset_form.form_submit_button("Send password reset email")
 
+        google_form = st.form("Sign in with Google")
+        google_form.subheader("Sign in with Google")
+        google_form.form_submit_button("Sign in", on_click=handle_google_request)
 
     if login and email and password:
         try:
@@ -70,15 +80,6 @@ def login(auth, db, cookie_manager):
                     st.error("Weak password: Password should be at least 6 characters")
                 else:
                     st.error(err)
-
-    def handle_google_request():
-        nav_script = """
-        <meta http-equiv="refresh" content="0; url='%s'">
-        """ % (auth_url)
-        st.write(nav_script, unsafe_allow_html=True)
-
-    st.title("Sign in with Google")
-    st.button("Sign in", on_click=handle_google_request)
 
     if len(st.query_params)>4:
         try:

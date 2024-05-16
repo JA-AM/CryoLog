@@ -1,21 +1,10 @@
 import streamlit as st
+import plotly.express as px
 from components.food_search import get_nutritional_info, search_food
+from components.list_items import display_items
 
 def clear():
     st.session_state.search_input = ""
-
-def show_list(db, currUser, userFoods):
-    for i, food in enumerate(userFoods):
-        with st.popover(f"{food['description']}({food['brandName']})"):
-            st.markdown(f"Food Category: {food['brandedFoodCategory']}")
-            st.markdown(f"FDC ID: {food['fdcId']}")
-            st.markdown(f"Ingredients: {food['ingredients']}")
-            with st.expander("Label Nutrients", expanded=False):
-                st.write(food['labelNutrients'])
-            if st.button("Delete", key=i): 
-                del userFoods[i] 
-                db.child("users").child(currUser["localId"]).child("Foods").set(userFoods)
-                st.switch_page('app.py')
 
 def search(db):
     currUser = st.session_state['user']
@@ -46,7 +35,10 @@ def search(db):
         else:
             st.write("Please enter a search query.")
     
-    show_list(db, currUser, userFoods)
+    with st.container(border=True):
+        st.subheader('My List')
+        st.write("✦ " * 4) 
+        display_items(db, userFoods, is_remove=True)
 
 if __name__ == "__main__":
     search()
