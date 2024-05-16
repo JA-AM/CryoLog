@@ -51,7 +51,8 @@ def callback(frame: av.VideoFrame) -> av.VideoFrame:
     return av.VideoFrame.from_ndarray(img, format="bgr24")
 
 def camera(db):
-    st.title("Barcode Scanner")
+    st.subheader("Barcode Scanner")
+    st.write("✦ " * 4)
 
     account_sid = st.secrets['TWILIO_ACCOUNT_SID']
     auth_token = st.secrets['TWILIO_AUTH_TOKEN']
@@ -59,21 +60,23 @@ def camera(db):
 
     token = client.tokens.create()
     
-    webrtc_ctx = webrtc_streamer(
-        key="opencv-filter",
-        mode=WebRtcMode.SENDRECV,
-        rtc_configuration={
-            "iceServers": token.ice_servers,
-            "iceTransportPolicy": "relay"
-        },
-        video_frame_callback=callback,
-        media_stream_constraints={"video": True, "audio": False},
-        async_processing=True
-    )
+    with st.container(border=True):
+        webrtc_ctx = webrtc_streamer(
+            key="opencv-filter",
+            mode=WebRtcMode.SENDRECV,
+            rtc_configuration={
+                "iceServers": token.ice_servers,
+                "iceTransportPolicy": "relay"
+            },
+            video_frame_callback=callback,
+            media_stream_constraints={"video": True, "audio": False},
+            async_processing=True
+        )
 
     if not webrtc_ctx.state.playing:
         st.subheader("Scanned Items")
-        display_items(db, detected_barcodes, is_barcode=True)
+        with st.container(border=True):
+            display_items(db, detected_barcodes, is_barcode=True)
 
 if __name__ == "__main__":
     camera()

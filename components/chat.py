@@ -2,6 +2,7 @@ import streamlit as st
 from snowflake.snowpark.session import Session
 import pandas as pd
 import markdown
+import time
 from components.food_search import search_food, get_nutritional_info
 from components.list_items import display_items
 
@@ -236,39 +237,73 @@ def display_response(question, rag, option_index, db):
     else:
         response, url = complete(question, rag, option_index, db)
         res_text = response[0].RESPONSE
-        st.markdown(res_text)
+        def yapper():
+            for word in res_text.split(" "):
+                yield word + " "
+                time.sleep(0.02)
+        st.write_stream(yapper)
 
         if rag == 1:
             display_url = f"[Link]({url}) that may be useful"
             st.markdown(display_url)
 
 def chat(db):
-    st.title("Snowflake Cortex: The Nutritionist")
+    st.subheader("Snowflake Cortex Helpers")
+    st.write("✦ " * 4) 
 
     options = ['General Nutritional Advice', 'Learn More About Specific Ingredients', 'Help With My List']
     option_index = 0
 
-    selected_option = st.selectbox('Select an option:', options, index=0)
-
-    if selected_option == 'General Nutritional Advice':
-        question = st.text_input("Enter question", placeholder="What is an example of a healthy breakfast?", label_visibility="collapsed")
-        option_index = 0
-    elif selected_option == 'Learn More About Specific Ingredients':
-        question = st.text_input("Learn more about: ", placeholder="arabinoxylan", label_visibility="collapsed")
-        option_index = 1
-    else:
-        question = st.text_input("Enter question", placeholder="Generate a list for me!", label_visibility="collapsed")
-        option_index = 2
-
+    # with st.container(border=True):
+    #     selected_option = st.selectbox('Select an option:', options, index=0)
     rag = st.checkbox('Use Context? (Recommended)', value=True)
 
     if rag:
         use_rag = 1
     else:
         use_rag = 0
-
-    if question:
-        display_response(question, use_rag, option_index, db)
+    
+    dietitian, nutritionist, shopper = st.tabs(['My Dietitian', 'My Nutritionist', 'My Shopper'])
+    with dietitian:
+        st.write('I provide general nutritional advice!')
+        diet_question = st.text_input("Enter question", placeholder="What is an example of a healthy breakfast?", label_visibility="collapsed")
+        diet_option_index = 0
+        if diet_question:
+            with st.container(border=True):
+                st.subheader('✦ Dietitian:')
+                with st.status('Cooking somthing up...', expanded=False) as status:
+                    display_response(diet_question, use_rag, diet_option_index, db)
+                    status.update(label="Plan prepared!", state="complete", expanded=True)
+    
+    with nutritionist:
+        st.write('Ask me to learn more about specific ingredients!')
+        nutr_question = st.text_input("Learn more about: ", placeholder="arabinoxylan", label_visibility="collapsed")
+        nutr_option_index = 1
+        if nutr_question:
+            with st.container(border=True):
+                st.subheader('✦ Nutritionist:')
+                with st.status('Taste testing...', expanded=False) as status:
+                    display_response(nutr_question, use_rag, nutr_option_index, db)
+                    status.update(label="Ready for review!", state="complete", expanded=True)
+    with shopper:
+        st.write('Get help with your shopping list!')
+        shop_question = st.text_input("Enter question", placeholder="Generate a list for me!", label_visibility="collapsed")
+        shop_option_index = 2
+        if shop_question:
+            with st.container(border=True):
+                st.subheader('✦ Shopper:')
+                with st.status('Browsing...', expanded=False) as status:
+                    display_response(shop_question, use_rag, shop_option_index, db)
+                    status.update(label="Found suggestions!", state="complete", expanded=True)
+    # if selected_option == 'General Nutritional Advice':
+    #     question = st.text_input("Enter question", placeholder="What is an example of a healthy breakfast?", label_visibility="collapsed")
+    #     option_index = 0
+    # elif selected_option == 'Learn More About Specific Ingredients':
+    #     question = st.text_input("Learn more about: ", placeholder="arabinoxylan", label_visibility="collapsed")
+    #     option_index = 1
+    # else:
+    #     question = st.text_input("Enter question", placeholder="Generate a list for me!", label_visibility="collapsed")
+    #     option_index = 2
 
 if __name__ == '__main__':
     chat()

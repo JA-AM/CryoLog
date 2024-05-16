@@ -41,7 +41,7 @@ def firebase_setup():
     return auth, db
 
 def display_header():
-    st.header("C R Y O L O G")
+    st.title("C R Y O L O G")
 
 def display_sidebar(auth, db, cookie_manager, default_tab):
     with st.sidebar:

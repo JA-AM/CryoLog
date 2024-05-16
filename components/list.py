@@ -57,7 +57,10 @@ def search(db):
         else:
             st.write("Please enter a search query.")
     
-    show_list(db, currUser, userFoods)
+    with st.container(border=True):
+        st.subheader('My List')
+        st.write("✦ " * 4) 
+        show_list(db, currUser, userFoods)
 
 if __name__ == "__main__":
     search()
