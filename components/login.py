@@ -2,6 +2,7 @@ import streamlit as st
 import requests
 from streamlit.components.v1 import html
 
+
 def login(auth, db, cookie_manager):
     auth_url = auth.authenticate_login_with_google()
     col1, col2 = st.columns([1,1])
@@ -19,6 +20,11 @@ def login(auth, db, cookie_manager):
         password = login_form.text_input("Password", type="password")
         login = login_form.form_submit_button("Login")
 
+        reset_form = st.form("Reset Password", clear_on_submit=True)
+        reset_form.subheader("Forgot Password?")
+        email_for_reset = reset_form.text_input("Email", key="reset_email")
+        reset = reset_form.form_submit_button("Send password reset email")
+
         google_form = st.form("Sign in with Google")
         google_form.subheader("Sign in with Google")
         google_form.form_submit_button("Sign in", on_click=handle_google_request)
@@ -31,6 +37,16 @@ def login(auth, db, cookie_manager):
             st.switch_page("app.py")
         except requests.exceptions.HTTPError as e:
             st.error("Invalid email or password!")
+    
+    if reset and email_for_reset:
+        if email_in_db(email_for_reset, db):
+            try: 
+                auth.send_password_reset_email(email_for_reset)
+                st.success("Email sent! Check your inbox.")
+            except requests.exceptions.HTTPError as e:
+                st.error(e)
+        else:
+            st.error("Account doesn't exist!")
     
     with col1:
         signup_form = st.form("Sign Up")
@@ -80,6 +96,9 @@ def login(auth, db, cookie_manager):
             st.error("Something went wrong. Please try again.")
         
     
-
-
-
+def email_in_db(email, db):
+    users = db.child("users").get()
+    for user in users.each():
+        if 'Email' in user.val() and user.val()['Email']==email and 'Password' in user.val():
+            return True
+    return False
