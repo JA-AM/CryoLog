@@ -55,7 +55,26 @@ def display_sidebar(auth, db, cookie_manager, default_tab):
         login(auth, db, cookie_manager)
     
     elif tabs =='Home':
-        st.title('Home')
+        st.subheader("✦ " * 4)
+        st.write('Your Intelligent Nutrition Companion (catchphrase goes here)')
+        st.image('https://a3.espncdn.com/combiner/i?img=%2Fi%2Fheadshots%2Fnba%2Fplayers%2Ffull%2F1966.png')
+        st.write('image replace with logo svg IMPORTANT')
+        st.write('Welcome to Cryolog, your all-in-one solution for optimizing your \
+                 nutrition and enhancing your well-being. Utilizing cutting-edge machine \
+                learning technology, Cryolog empowers you to cultivate healthier eating \
+                 habits, streamline your shopping experience, and achieve peak nutrient \
+                 intake effortlessly. (gpt blurb, replace with actual person speak)')
+        st.image('https://a3.espncdn.com/combiner/i?img=%2Fi%2Fheadshots%2Fnba%2Fplayers%2Ffull%2F1966.png')
+        st.write('image replace with smth small or uncontrasting, break up text')
+        st.write('Say goodbye to guesswork and hello to precision with Cryolog\'s personalized \
+                 recommendations tailored to your unique dietary needs and wellness goals. Whether \
+                 you\'re striving to manage weight, increase energy levels, or simply cultivate a \
+                 healthier lifestyle, Cryolog provides you with actionable insights and guidance every \
+                 step of the way. (more gpt speak, remember to replace)')
+        st.write("✦ " * 4)
+        st.write('With Cryolog, the journey to a healthier you is simplified, efficient, and \
+                 enjoyable. Take the first step towards unlocking your full potential with Cryolog today')
+        
 
     elif tabs == 'Profile':
         profile(db, cookie_manager)
