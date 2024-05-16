@@ -1,4 +1,5 @@
 import streamlit as st
+import plotly.express as px
 from components.food_search import get_nutritional_info, search_food
 
 def clear():
@@ -11,7 +12,17 @@ def show_list(db, currUser, userFoods):
             st.markdown(f"FDC ID: {food['fdcId']}")
             st.markdown(f"Ingredients: {food['ingredients']}")
             with st.expander("Label Nutrients", expanded=False):
-                st.write(food['labelNutrients'])
+                extract_keys = ['carbohydrates', 'fat', 'protein']
+                macros = {key: food['labelNutrients'][key] for key in extract_keys if key in food['labelNutrients']}
+                # other_values = sum(value for key, value in food['labelNutrients'].items() if key not in extract_keys)
+                # macros['other'] = other_values
+                data = {'Macros ': list(macros.keys()), 'Value ': list(macros.values())}
+                fig = px.pie(data, names='Macros ', values='Value ', title='Macros')
+                # data = {'Components ': list(food['labelNutrients'].keys()), 'Value ': list(food['labelNutrients'].values())}
+                # fig = px.pie(data, names='Components ', values='Value ', title='Nutrients')
+                st.plotly_chart(fig, use_container_width=True)
+                st.write('All Nutritional Information')
+                st.json(food['labelNutrients'], expanded=False)
             if st.button("Delete", key=i): 
                 del userFoods[i] 
                 db.child("users").child(currUser["localId"]).child("Foods").set(userFoods)
