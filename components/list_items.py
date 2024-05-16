@@ -1,7 +1,9 @@
 import streamlit as st
 from components.food_search import get_nutritional_info_barcode, get_nutritional_info
+import plotly.express as px
 
-def display_items(db, items_list, is_barcode=False):
+@st.experimental_fragment()
+def display_items(db, items_list, is_barcode=False, is_remove=False):
     from components.chat import complete
 
     currUser = st.session_state['user']
@@ -40,11 +42,27 @@ def display_items(db, items_list, is_barcode=False):
                         st.markdown(res_text)
             
             with st.expander("Label Nutrients", expanded=False):
+                extract_keys = ['carbohydrates', 'fat', 'protein']
+                macros = {key: item['labelNutrients'][key] for key in extract_keys if key in item['labelNutrients']}
+                # other_values = sum(value for key, value in food['labelNutrients'].items() if key not in extract_keys)
+                # macros['other'] = other_values
+                data = {'Macros ': list(macros.keys()), 'Value ': list(macros.values())}
+                fig = px.pie(data, names='Macros ', values='Value ', title='Macros')
+                # data = {'Components ': list(food['labelNutrients'].keys()), 'Value ': list(food['labelNutrients'].values())}
+                # fig = px.pie(data, names='Components ', values='Value ', title='Nutrients')
+                st.plotly_chart(fig, use_container_width=True)
+                st.write('All Nutritional Information')
+                st.json(item['labelNutrients'], expanded=False)
                 st.write(product_info['labelNutrients'])
             
             num_items = st.number_input("Number of Items to Add", 1, 10, key=str(i)+"num")
 
-            if st.button("Add to List", key=i):
+            if not is_remove and st.button("Add to List", key=i):
                 st.toast(f"Added {num_items} {product_info['description']} to My List", icon="✅") 
                 userFoods.extend([product_info] * num_items)
                 db.child("users").child(currUser["localId"]).child("Foods").set(userFoods)
+            
+            if is_remove and st.button("Delete", key=i): 
+                del userFoods[i] 
+                db.child("users").child(currUser["localId"]).child("Foods").set(userFoods)
+                st.switch_page('app.py')

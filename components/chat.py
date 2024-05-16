@@ -20,7 +20,7 @@ def create_prompt(myquestion, rag, option_index, db):
         elif option_index == 1:
             prompt, url = ingredients_prompt(myquestion)
         else:
-            prompt, url = ""
+            prompt = list_prompt_1(myquestion, db)
     # No context
     else:
         if option_index == 2:
@@ -160,7 +160,7 @@ def list_prompt_2(myquestion, data_list, db):
           User Preferences: {preferences}
           Product List: {data_list}
           Question: {myquestion} 
-         (IMPORTANT) Answer Format: Bullet list of ONLY the index values for product list
+          Answer Format: Bullet list of ONLY the index values for product list
            Answer: '
            """
     
@@ -197,55 +197,59 @@ def complete(myquestion, rag, option_index, db):
     return df_response, url 
 
 def display_response(question, rag, option_index, db):
-    if option_index == 2:
-        response1, _ = complete(question, rag, option_index, db)
-        res_text1 = response1[0].RESPONSE
-        st.markdown(res_text1)
+    response, url = complete(question, rag, option_index, db)
+    res_text = response[0].RESPONSE
+    def yapper():
+        for word in res_text.split(" "):
+            yield word + " "
+            time.sleep(0.02)
+    st.write_stream(yapper)
 
-        recommended_list = extract_lists_from_markdown(res_text1)
+    if rag == 1:
+        display_url = f"[Link]({url}) that may be useful"
+        st.markdown(display_url)
 
-        food_data_list = []
-        for item in recommended_list:
-            for food in search_food(item)[:3]:
-                product_info = get_nutritional_info(food['fdcId'])
-                food_data_list.append(product_info)
-        
-        cmd = f"""
-             select snowflake.cortex.complete(?,?) as response
-            """
-        prompt = list_prompt_2(question, food_data_list, db)
-        response2 = session.sql(cmd, params=['snowflake-arctic', prompt]).collect()
-        res_text2 = response2[0].RESPONSE
-        picked_list = extract_lists_from_markdown(res_text2)
+def display_shopper_response(question, db):
+    response1, _ = complete(question, 0, 2, db)
+    res_text1 = response1[0].RESPONSE
+    st.markdown(res_text1)
 
-        index_list = []
-        for item in picked_list:
+    recommended_list = extract_lists_from_markdown(res_text1)
+
+    food_data_list = []
+    for item in recommended_list:
+        for food in search_food(item)[:3]:
+            product_info = get_nutritional_info(food['fdcId'])
+            food_data_list.append(product_info)
+    
+    cmd = f"""
+            select snowflake.cortex.complete(?,?) as response
+        """
+    prompt = list_prompt_2(question, food_data_list, db)
+    response2 = session.sql(cmd, params=['snowflake-arctic', prompt]).collect()
+    res_text2 = response2[0].RESPONSE
+
+    print(res_text2)
+    picked_list = extract_lists_from_markdown(res_text2)
+
+    index_list = []
+    for item in picked_list:
+        if item.isdigit():
+            index_list.append(int(item))
+        else:
             try:
-                index_list.append(int(item))
+                index_list.append(int(item[1:-1]))
             except ValueError:
                 pass
-        
-        final_output = []
-        for index in index_list:
-            try:
-                final_output.append(food_data_list[index])
-            except IndexError:
-                pass
-
-        display_items(db, final_output)
-        
-    else:
-        response, url = complete(question, rag, option_index, db)
-        res_text = response[0].RESPONSE
-        def yapper():
-            for word in res_text.split(" "):
-                yield word + " "
-                time.sleep(0.02)
-        st.write_stream(yapper)
-
-        if rag == 1:
-            display_url = f"[Link]({url}) that may be useful"
-            st.markdown(display_url)
+    
+    final_output = []
+    for index in index_list:
+        try:
+            final_output.append(food_data_list[index])
+        except IndexError:
+            pass
+    
+    return final_output
 
 def chat(db):
     st.subheader("Snowflake Cortex Helpers")
@@ -293,8 +297,9 @@ def chat(db):
             with st.container(border=True):
                 st.subheader('✦ Shopper:')
                 with st.status('Browsing...', expanded=False) as status:
-                    display_response(shop_question, use_rag, shop_option_index, db)
+                    suggested_items = display_shopper_response(shop_question, db)
                     status.update(label="Found suggestions!", state="complete", expanded=True)
+                display_items(db, suggested_items)
     # if selected_option == 'General Nutritional Advice':
     #     question = st.text_input("Enter question", placeholder="What is an example of a healthy breakfast?", label_visibility="collapsed")
     #     option_index = 0
