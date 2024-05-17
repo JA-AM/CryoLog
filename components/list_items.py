@@ -23,7 +23,7 @@ def display_items(db, items_list, is_barcode=False, is_remove=False):
             st.toast(f"No Information For Barcode: {item}")
             continue
         
-        with st.popover(f"{product_info['description']}({product_info['brandName']})"):
+        with st.popover(f"{product_info['description']}({product_info['brandName']})", use_container_width=True):
             st.markdown(f"**Food Category:** {product_info['brandedFoodCategory']}")
             st.markdown(f"**FDC ID:** {product_info['fdcId']}")
 

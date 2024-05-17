@@ -253,7 +253,7 @@ def display_shopper_response(question, db):
 
 def chat(db):
     st.subheader("Snowflake Cortex Helpers")
-    st.write("✦ " * 4) 
+    st.markdown("""<span style='color: #779ecb;'>✦ ✦ ✦ ✦""", unsafe_allow_html=True)
 
     options = ['General Nutritional Advice', 'Learn More About Specific Ingredients', 'Help With My List']
     option_index = 0
@@ -275,7 +275,7 @@ def chat(db):
         diet_option_index = 0
         if diet_question:
             with st.container(border=True):
-                st.subheader('✦ Dietitian:')
+                st.markdown("""<span style='color: #779ecb; font-size: 1.5em;'>✦ </span><b style='font-size: 1.5em;'>Dietitian""", unsafe_allow_html=True)
                 with st.chat_message('user'):
                     st.write(diet_question)
                 with st.status('Cooking something up...', expanded=False) as status:
@@ -283,26 +283,26 @@ def chat(db):
                     status.update(label="Answer prepared!", state="complete", expanded=True)
     
     with nutritionist:
-        with st.chat_message('assistant'):
+        with st.chat_message('assistant', avatar='🥗'):
             st.write('Ask me to learn more about specific ingredients!')
         nutr_question = st.chat_input(placeholder="arabinoxylan")
         nutr_option_index = 1
         if nutr_question:
             with st.container(border=True):
-                st.subheader('✦ Nutritionist:')
+                st.markdown("""<span style='color: #779ecb; font-size: 1.5em;'>✦ </span><b style='font-size: 1.5em;'>Nutritionist""", unsafe_allow_html=True)
                 with st.chat_message('user'):
                     st.write(nutr_question)
                 with st.status('Taste testing...', expanded=False) as status:
                     display_response(nutr_question, use_rag, nutr_option_index, db)
                     status.update(label="Ready for review!", state="complete", expanded=True)
     with shopper:
-        with st.chat_message('assistant'):
+        with st.chat_message('assistant', avatar='🛒'):
             st.write('Get help with your shopping list!')
         shop_question = st.chat_input(placeholder="Generate a list for me!")
         shop_option_index = 2
         if shop_question:
             with st.container(border=True):
-                st.subheader('✦ Shopper:')
+                st.markdown("""<span style='color: #779ecb; font-size: 1.5em;'>✦ </span><b style='font-size: 1.5em;'>Shopper""", unsafe_allow_html=True)
                 with st.chat_message('user'):
                     st.write(shop_question)
                 with st.status('Browsing...', expanded=False) as status:

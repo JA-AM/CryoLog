@@ -9,9 +9,9 @@ def profile(db, cookie_manager):
     else:        
         username =  db.child("users").child(currUser['localId']).get().val()["Email"]
         username = username.split("@")[0]
+    st.header("Profile")
+    st.markdown("""<span style='color: #779ecb;'>✦ ✦ ✦ ✦""", unsafe_allow_html=True)
     st.subheader("Welcome, " + username)
-    st.write("✦ " * 4)
-
 
     user_data = db.child("users").child(currUser["localId"]).get().val()
 
@@ -66,7 +66,7 @@ def profile(db, cookie_manager):
                 key='pref')
                 if st.button('Save', key='prefsub'):
                     db.child("users").child(currUser["localId"]).child("Preferences").set(preferences)
-    st.write("✦ " * 4)
+    st.markdown("""<span style='color: #779ecb;'>✦ ✦ ✦ ✦""", unsafe_allow_html=True)
 
     def biometrics_form(label, preset_value):
         with st.form(label + 'form'):

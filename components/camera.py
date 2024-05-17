@@ -52,7 +52,7 @@ def callback(frame: av.VideoFrame) -> av.VideoFrame:
 
 def camera(db):
     st.subheader("Barcode Scanner")
-    st.write("✦ " * 4)
+    st.markdown("""<span style='color: #779ecb;'>✦ ✦ ✦ ✦""", unsafe_allow_html=True)
 
     account_sid = st.secrets['TWILIO_ACCOUNT_SID']
     auth_token = st.secrets['TWILIO_AUTH_TOKEN']
