@@ -55,5 +55,5 @@ def get_nutritional_info(food_id):
 
 if __name__ == "__main__":
     barcode = "0022000159335"  # Replace this with your actual barcode number
-    product_nutrition = get_nutritional_info("356554")
+    product_nutrition = get_nutritional_info("2341867")
     #print(product_nutrition)

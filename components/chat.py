@@ -160,8 +160,8 @@ def list_prompt_2(myquestion, data_list, db):
           User Preferences: {preferences}
           Product List: {data_list}
           Question: {myquestion} 
-          Answer Format: Bullet list of ONLY the index values for product list
-           Answer: '
+          Answer Format: Markdown bullet list of ONLY the index values for product list
+          Answer: '
            """
     
     return prompt
@@ -269,33 +269,42 @@ def chat(db):
     
     dietitian, nutritionist, shopper = st.tabs(['My Dietitian', 'My Nutritionist', 'My Shopper'])
     with dietitian:
-        st.write('I provide general nutritional advice!')
-        diet_question = st.text_input("Enter question", placeholder="What is an example of a healthy breakfast?", label_visibility="collapsed")
+        with st.chat_message('assistant'):
+            st.write('I provide general nutritional advice!')
+        diet_question = st.chat_input(placeholder="What is an example of a healthy breakfast?")
         diet_option_index = 0
         if diet_question:
             with st.container(border=True):
                 st.subheader('✦ Dietitian:')
-                with st.status('Cooking somthing up...', expanded=False) as status:
+                with st.chat_message('user'):
+                    st.write(diet_question)
+                with st.status('Cooking something up...', expanded=False) as status:
                     display_response(diet_question, use_rag, diet_option_index, db)
-                    status.update(label="Plan prepared!", state="complete", expanded=True)
+                    status.update(label="Answer prepared!", state="complete", expanded=True)
     
     with nutritionist:
-        st.write('Ask me to learn more about specific ingredients!')
-        nutr_question = st.text_input("Learn more about: ", placeholder="arabinoxylan", label_visibility="collapsed")
+        with st.chat_message('assistant'):
+            st.write('Ask me to learn more about specific ingredients!')
+        nutr_question = st.chat_input(placeholder="arabinoxylan")
         nutr_option_index = 1
         if nutr_question:
             with st.container(border=True):
                 st.subheader('✦ Nutritionist:')
+                with st.chat_message('user'):
+                    st.write(nutr_question)
                 with st.status('Taste testing...', expanded=False) as status:
                     display_response(nutr_question, use_rag, nutr_option_index, db)
                     status.update(label="Ready for review!", state="complete", expanded=True)
     with shopper:
-        st.write('Get help with your shopping list!')
-        shop_question = st.text_input("Enter question", placeholder="Generate a list for me!", label_visibility="collapsed")
+        with st.chat_message('assistant'):
+            st.write('Get help with your shopping list!')
+        shop_question = st.chat_input(placeholder="Generate a list for me!")
         shop_option_index = 2
         if shop_question:
             with st.container(border=True):
                 st.subheader('✦ Shopper:')
+                with st.chat_message('user'):
+                    st.write(shop_question)
                 with st.status('Browsing...', expanded=False) as status:
                     suggested_items = display_shopper_response(shop_question, db)
                     status.update(label="Found suggestions!", state="complete", expanded=True)
