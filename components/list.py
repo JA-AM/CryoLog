@@ -34,9 +34,9 @@ def search(db):
                 st.write("No results found.")
         else:
             st.write("Please enter a search query.")
-    
+
     with st.container(border=True):
-        st.subheader('My List')
+        st.subheader('My Shopping List')
         st.write("✦ " * 4) 
         display_items(db, userFoods, is_remove=True)
 

@@ -13,7 +13,11 @@ import time
 st.set_page_config(layout="wide")
 st.markdown('<style>' + open('./css/style.css').read() + '</style>', unsafe_allow_html=True)
 
-time.sleep(0.4)
+placeholder = st.empty()
+with placeholder.status('Loading...'):
+    cookie_manager = CookieController()
+    time.sleep(0.4)
+placeholder.empty()
 
 def get_state_from_cookie(cookie_manager):
     if cookie_manager.get("session_state_save"):
@@ -89,7 +93,6 @@ def display_sidebar(auth, db, cookie_manager, default_tab):
         chat(db)
 
 def main():
-    cookie_manager = CookieController()
     auth, db = firebase_setup()
     get_state_from_cookie(cookie_manager)
     default_tab = get_default_tab_from_cookie(cookie_manager)

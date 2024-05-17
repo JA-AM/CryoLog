@@ -10,6 +10,9 @@ def display_items(db, items_list, is_barcode=False, is_remove=False):
     user_data = db.child("users").child(currUser["localId"]).get().val()
     userFoods = user_data.get("Foods", [])
 
+    if is_barcode and not items_list:
+        st.write('No scannable items found yet :(')
+
     for i, item in enumerate(items_list):
         if is_barcode:
             product_info = get_nutritional_info_barcode(item)
