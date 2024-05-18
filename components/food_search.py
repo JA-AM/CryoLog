@@ -19,7 +19,8 @@ def search_food(query):
         return None
 
 def extract_product_info(data: dict):
-    keys = ["description", "brandedFoodCategory", "brandName"]
+    keys = ["description", "brandedFoodCategory", "brandName", "brandOwner"]
+    nutrient_nums = ['203','204','205','208','269','291','303','307','601']
     product_info = {key: data.get(key, "N/A").title() for key in keys}
     
     product_info['fdcId'] = data["fdcId"]
@@ -34,7 +35,7 @@ def extract_product_info(data: dict):
     if 'labelNutrients' in data:
         product_info['labelNutrients'] = {macro: value_dict['value'] for macro, value_dict in data['labelNutrients'].items()}
     else:
-        product_info['foodNutrients'] = {foodNutrient['name'].lower(): foodNutrient['amount'] for foodNutrient in data['foodNutrients']}
+        product_info['foodNutrients'] = {foodNutrient['nutrient']['name'].lower(): foodNutrient['amount'] for foodNutrient in data['foodNutrients'] if foodNutrient['nutrient']['number'] in nutrient_nums}
 
     return product_info
 
@@ -42,7 +43,7 @@ def get_nutritional_info(food_id):
     url = f"https://api.nal.usda.gov/fdc/v1/food/{food_id}"
     params = {
         'api_key': api_key,
-        'format': 'abridged',
+        'format': 'full',
         'nutrients': '203,204,205,208,269,291,303,307,601'
     }
     try:

@@ -61,19 +61,20 @@ def nutritional_prompt(myquestion, db):
     
     prompt_context = prompt_context.replace("'", "")
 
-    conditions = user_data.get("Conditions", "")
+    biometrics = user_data.get("Biometrics", "")
     preferences = user_data.get("Preferences", "")
+    goals = user_data.get("Goals", "")
     
 
     prompt = f"""
           'You are an expert nutritional advisor that uses the context provided to generate a well-informed reponse. 
            Answer the question based on the context. Be concise and do not hallucinate. 
            If you don't have the information, tell me you do not have it, and advise me to uncheck the "Use Context" box.
-          Context: {prompt_context}
-          My Medical Conditions: {conditions}
-          My Preferences: {preferences}
-          Question:  
-           {myquestion} 
+            Context: {prompt_context}
+            My Biometrics: {biometrics}
+            My Preferences: {preferences}
+            My Goals: {goals}
+            Question: {myquestion} 
            Answer: '
            """
     
@@ -119,8 +120,9 @@ def list_prompt_1(myquestion, db):
     currUser = st.session_state['user']
     user_data = db.child("users").child(currUser["localId"]).get().val()
     user_food_list = [food['description'] for food in user_data.get('Foods', [])]
-    conditions = user_data.get("Conditions", "")
+    biometrics = user_data.get("Biometrics", "")
     preferences = user_data.get("Preferences", "")
+    goals = user_data.get("Goals", "")
 
     prompt = f"""
           'You are an expert nutritional assistant designed to give recommended lists of food products
@@ -129,8 +131,9 @@ def list_prompt_1(myquestion, db):
           in mind general nutrition principles, so do not overly rely on a user's preferences,
           but keep them in mind. 
           User Current Food List: {user_food_list}
-          User Conditions: {conditions}
+          User Biometrics: {biometrics}
           User Preferences: {preferences}
+          User Goals: {goals}
           Question: {myquestion} 
           (IMPORTANT) Format: Bulleted Markdown List, Max Length 5
            Answer: '
@@ -142,8 +145,9 @@ def list_prompt_2(myquestion, data_list, db):
     currUser = st.session_state['user']
     user_data = db.child("users").child(currUser["localId"]).get().val()
     user_food_list = [food['description'] for food in user_data.get('Foods', [])]
-    conditions = user_data.get("Conditions", "")
+    biometrics = user_data.get("Biometrics", "")
     preferences = user_data.get("Preferences", "")
+    goals = user_data.get("Goals", "")
 
     prompt = f"""
           'You are an expert nutritional assistant designed to select certain products
@@ -156,8 +160,9 @@ def list_prompt_2(myquestion, data_list, db):
           in mind general nutrition principles, so do not overly rely on a user's preferences,
           but keep them in mind.
           User Current Food List: {user_food_list}
-          User Conditions: {conditions}
+          User Biometrics: {biometrics}
           User Preferences: {preferences}
+          User Goals: {goals}
           Product List: {data_list}
           Question: {myquestion} 
           Answer Format: Markdown bullet list of ONLY the index values for product list
@@ -199,11 +204,12 @@ def complete(myquestion, rag, option_index, db):
 def display_response(question, rag, option_index, db):
     response, url = complete(question, rag, option_index, db)
     res_text = response[0].RESPONSE
-    def yapper():
+    def stream():
         for word in res_text.split(" "):
             yield word + " "
-            time.sleep(0.02)
-    st.write_stream(yapper)
+            time.sleep(0.05)
+    
+    st.write_stream(stream)
 
     if rag == 1:
         display_url = f"[Link]({url}) that may be useful"
@@ -252,14 +258,10 @@ def display_shopper_response(question, db):
     return final_output
 
 def chat(db):
-    st.subheader("Snowflake Cortex Helpers")
+    st.header("Chat With Snowflake Arctic Helpers")
     st.markdown("""<span style='color: #779ecb;'>✦ ✦ ✦ ✦""", unsafe_allow_html=True)
-
-    options = ['General Nutritional Advice', 'Learn More About Specific Ingredients', 'Help With My List']
-    option_index = 0
-
-    # with st.container(border=True):
-    #     selected_option = st.selectbox('Select an option:', options, index=0)
+    st.markdown("**Ask any one of our helpers about general dietary information, understanding \
+                complicated nutritional terms, or finding foods based on your needs!**")
     rag = st.toggle('Use Context? (Recommended)', value=True)
 
     if rag:
@@ -267,10 +269,10 @@ def chat(db):
     else:
         use_rag = 0
     
-    dietitian, nutritionist, shopper = st.tabs(['My Dietitian', 'My Nutritionist', 'My Shopper'])
+    dietitian, nutritionist, shopper = st.tabs(['Dave the Dietitian', 'Neil the Nutritionist', 'Sarah the Shopper'])
     with dietitian:
         with st.container(border=True):
-            with st.chat_message('assistant'):
+            with st.chat_message('assistant', avatar='🐻‍❄️'):
                 st.write('I provide general nutritional advice!')
             diet_question = st.chat_input(placeholder="What is an example of a healthy breakfast?")
             diet_option_index = 0
@@ -279,13 +281,13 @@ def chat(db):
                     st.markdown("""<span style='color: #779ecb; font-size: 1.5em;'>✦ </span><b style='font-size: 1.5em;'>Dietitian""", unsafe_allow_html=True)
                     with st.chat_message('user'):
                         st.write(diet_question)
-                    with st.status('Cooking something up...', expanded=False) as status:
+                    with st.status('Cooking something up...', expanded=True) as status:
                         display_response(diet_question, use_rag, diet_option_index, db)
                         status.update(label="Answer prepared!", state="complete", expanded=True)
     
     with nutritionist:
         with st.container(border=True):
-            with st.chat_message('assistant', avatar='🥗'):
+            with st.chat_message('assistant', avatar='🐧'):
                 st.write('Ask me to learn more about specific ingredients!')
             nutr_question = st.chat_input(placeholder="arabinoxylan")
             nutr_option_index = 1
@@ -294,13 +296,13 @@ def chat(db):
                     st.markdown("""<span style='color: #779ecb; font-size: 1.5em;'>✦ </span><b style='font-size: 1.5em;'>Nutritionist""", unsafe_allow_html=True)
                     with st.chat_message('user'):
                         st.write(nutr_question)
-                    with st.status('Taste testing...', expanded=False) as status:
+                    with st.status('Taste testing...', expanded=True) as status:
                         display_response(nutr_question, use_rag, nutr_option_index, db)
                         status.update(label="Ready for review!", state="complete", expanded=True)
     with shopper:
         with st.container(border=True):
-            with st.chat_message('assistant', avatar='🛒'):
-                st.write('Get help with your shopping list!')
+            with st.chat_message('assistant', avatar='☃️'):
+                st.write('I can help with your shopping list!')
             shop_question = st.chat_input(placeholder="Generate a list for me!")
             shop_option_index = 2
             if shop_question:
@@ -308,7 +310,7 @@ def chat(db):
                     st.markdown("""<span style='color: #779ecb; font-size: 1.5em;'>✦ </span><b style='font-size: 1.5em;'>Shopper""", unsafe_allow_html=True)
                     with st.chat_message('user'):
                         st.write(shop_question)
-                    with st.status('Browsing...', expanded=False) as status:
+                    with st.status('Browsing...', expanded=True) as status:
                         suggested_items = display_shopper_response(shop_question, db)
                         status.update(label="Found suggestions!", state="complete", expanded=True)
                     display_items(db, suggested_items)

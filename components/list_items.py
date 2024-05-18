@@ -23,9 +23,23 @@ def display_items(db, items_list, is_barcode=False, is_remove=False):
             st.toast(f"No Information For Barcode: {item}")
             continue
         
-        with st.popover(f"{product_info['description']}({product_info['brandName']})", use_container_width=True):
-            st.markdown(f"**Food Category:** {product_info['brandedFoodCategory']}")
-            st.markdown(f"**FDC ID:** {product_info['fdcId']}")
+        with st.popover(f"{product_info['description']}({product_info['brandOwner']})", use_container_width=True):
+            col1, col2 = st.columns(2)
+            with col1:
+                st.markdown(
+                    f"""
+                    **Product Name:** {product_info['description']}\n
+                    **Brand Name:** {product_info['brandName']}\n
+                    **Brand Owner:** {product_info['brandOwner']}\n
+                    """
+                )
+            with col2:
+                st.markdown(
+                    f"""
+                    **FDC ID:** {product_info['fdcId']}\n
+                    **Food Category:** {product_info['brandedFoodCategory']}\n
+                    """
+                )
 
             col1, col2 = st.columns(2)
             with col1:
@@ -44,19 +58,19 @@ def display_items(db, items_list, is_barcode=False, is_remove=False):
                         res_text = response[0].RESPONSE
                         st.markdown(res_text)
             
-            nutrient_key = 'labelNutrients' if 'labelNutrients' in item else 'foodNutrients'
+            nutrient_key = 'labelNutrients' if 'labelNutrients' in product_info else 'foodNutrients'
             with st.expander("Nutrient Information", expanded=False):
                 extract_keys = ['carbohydrates', 'fat', 'protein', 'total lipid (fat)', 'carbohydrate, by difference']
-                macros = {key: item[nutrient_key][key] for key in extract_keys if key in item[nutrient_key]}
+                macros = {key: product_info[nutrient_key][key] for key in extract_keys if key in product_info[nutrient_key]}
                 # other_values = sum(value for key, value in food['labelNutrients'].items() if key not in extract_keys)
                 # macros['other'] = other_values
-                data = {'Macros ': list(macros.keys()), 'Value ': list(macros.values())}
-                fig = px.pie(data, names='Macros ', values='Value ', title='Macros')
+                data = {'Macros': list(macros.keys()), 'Value ': list(macros.values())}
+                fig = px.pie(data, names='Macros', values='Value ', title='Basic Macronutrient Pi Chart')
                 # data = {'Components ': list(food['labelNutrients'].keys()), 'Value ': list(food['labelNutrients'].values())}
                 # fig = px.pie(data, names='Components ', values='Value ', title='Nutrients')
                 st.plotly_chart(fig, use_container_width=True)
                 st.write('All Nutritional Information')
-                st.json(item[nutrient_key], expanded=False)
+                st.json(product_info[nutrient_key], expanded=False)
             
             if not is_remove:
                 num_items = st.number_input("Number of Items to Add", 1, 10, key=str(i)+"num")

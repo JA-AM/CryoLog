@@ -9,27 +9,23 @@ from components.camera import camera
 from st_on_hover_tabs import on_hover_tabs
 import time
 
+with open("images/cryolog_logo.svg", "r") as file:
+    logo = file.read()
 
-st.set_page_config(layout="wide")
+st.set_page_config(layout="wide", page_icon=logo, page_title="CryoLog")
 st.markdown('<style>' + open('./css/style.css').read() + '</style>', unsafe_allow_html=True)
+cookie_manager = CookieController()
 
-placeholder = st.empty()
-with placeholder.status('Loading...'):
-    cookie_manager = CookieController()
-    time.sleep(0.4)
-placeholder.empty()
-
-def get_state_from_cookie(cookie_manager):
+def get_state_from_cookie():
     if cookie_manager.get("session_state_save"):
         st.session_state['user'] = cookie_manager.get("session_state_save")
 
-def get_default_tab_from_cookie(cookie_manager):
+def get_default_tab_from_cookie():
     if "prev_saved_tab" not in st.session_state and cookie_manager.getAll():
         default_tab = cookie_manager.get("tabs_save") if cookie_manager.get("tabs_save") else 0
         st.session_state['prev_saved_tab'] = default_tab
-        return default_tab
-    else:
-        return st.session_state['prev_saved_tab']
+        
+    return st.session_state.get('prev_saved_tab', 0)
 
 def firebase_setup():
     config = st.secrets["firebaseConfig"]
@@ -45,9 +41,14 @@ def firebase_setup():
     return auth, db
 
 def display_header():
-    st.title("C R Y O L O G")
+    col1, col2 = st.columns([1, 6])
+    with col1:
+        st.image(logo, use_column_width=True)
+    with col2:
+        st.title("CryoLog")
+    st.markdown('<hr class="divider">', unsafe_allow_html=True)
 
-def display_sidebar(auth, db, cookie_manager, default_tab):
+def display_sidebar(auth, db, default_tab):
     with st.sidebar:
         tabs = on_hover_tabs(tabName=['Home', 'Profile', 'Scan', 'My List', 'Chat'], 
                             iconName=["home", 'personrounded', 'camera', "listrounded", "assistantsharp"], 
@@ -57,49 +58,51 @@ def display_sidebar(auth, db, cookie_manager, default_tab):
     
     if 'user' not in st.session_state:
         login(auth, db, cookie_manager)
-    
     elif tabs =='Home':
-        st.markdown("""<span style='color: #779ecb; font-size: 1.5em;'>✦ ✦ ✦ ✦""", unsafe_allow_html=True)
-        st.markdown("""</span>""", unsafe_allow_html=True)
-        st.write('Your Intelligent Nutrition Companion (catchphrase goes here)')
-        st.image('https://a3.espncdn.com/combiner/i?img=%2Fi%2Fheadshots%2Fnba%2Fplayers%2Ffull%2F1966.png')
-        st.write('image replace with logo svg IMPORTANT')
-        st.write('Welcome to Cryolog, your all-in-one solution for optimizing your \
-                 nutrition and enhancing your well-being. Utilizing cutting-edge machine \
-                learning technology, Cryolog empowers you to cultivate healthier eating \
-                 habits, streamline your shopping experience, and achieve peak nutrient \
-                 intake effortlessly. (gpt blurb, replace with actual person speak)')
-        
-        with st.expander('Lebronify'):
-            st.image('https://a3.espncdn.com/combiner/i?img=%2Fi%2Fheadshots%2Fnba%2Fplayers%2Ffull%2F1966.png')
-            st.write('image replace with smth small or uncontrasting, break up text')
-            st.write('Say goodbye to guesswork and hello to precision with Cryolog\'s personalized \
-                    recommendations tailored to your unique dietary needs and wellness goals. Whether \
-                    you\'re striving to manage weight, increase energy levels, or simply cultivate a \
-                    healthier lifestyle, Cryolog provides you with actionable insights and guidance every \
-                    step of the way. (more gpt speak, remember to replace)')
-        st.markdown("""<span style='color: #779ecb;'>✦ ✦ ✦ ✦""", unsafe_allow_html=True)
-        st.write('With Cryolog, the journey to a healthier you is simplified, efficient, and \
-                 enjoyable. Take the first step towards unlocking your full potential with Cryolog today')
-
+        home()
     elif tabs == 'Profile':
-        profile(db, cookie_manager)
-    
+        profile(auth, db, cookie_manager)
     elif tabs == 'Scan':
         camera(db)
-
     elif tabs == 'My List':
         search(db)
-    
     elif tabs == 'Chat':
         chat(db)
 
+def home():
+    st.header("Home")
+    st.markdown("""<span style='color: #779ecb; font-size: 1.5em;'>✦ ✦ ✦ ✦""", unsafe_allow_html=True)
+    st.markdown("**Welcome to CryoLog, your chilly grocery list powered by Streamlit and Snowflake Arctic!**")
+    with st.expander("What is CryoLog?"):
+        st.markdown("""
+                 CryoLog is your all-in-one solution for optimizing your
+                nutrition and enhancing your well-being. Utilizing cutting-edge machine 
+                learning technology, Cryolog empowers you to cultivate healthier eating 
+                habits, streamline your shopping experience, and achieve peak nutrient 
+                intake effortlessly. (gpt blurb, replace with actual person speak)
+                 """)
+    
+    with st.expander('Lebronify'):
+        st.image('https://a3.espncdn.com/combiner/i?img=%2Fi%2Fheadshots%2Fnba%2Fplayers%2Ffull%2F1966.png')
+        st.write('image replace with smth small or uncontrasting, break up text')
+        st.write('Say goodbye to guesswork and hello to precision with Cryolog\'s personalized \
+                recommendations tailored to your unique dietary needs and wellness goals. Whether \
+                you\'re striving to manage weight, increase energy levels, or simply cultivate a \
+                healthier lifestyle, Cryolog provides you with actionable insights and guidance every \
+                step of the way. (more gpt speak, remember to replace)')
+    #st.markdown("""<span style='color: #779ecb;'>✦ ✦ ✦ ✦""", unsafe_allow_html=True)
+    st.write('With Cryolog, the journey to a healthier you is simplified, efficient, and \
+                enjoyable. Take the first step towards unlocking your full potential with Cryolog today')
 def main():
     auth, db = firebase_setup()
-    get_state_from_cookie(cookie_manager)
-    default_tab = get_default_tab_from_cookie(cookie_manager)
+    get_state_from_cookie()
+    placeholder = st.empty()
+    with placeholder.status('Loading...'):
+        default_tab = get_default_tab_from_cookie()
+        time.sleep(0.4)
+    placeholder.empty()
     display_header()
-    display_sidebar(auth, db, cookie_manager, default_tab)
+    display_sidebar(auth, db, default_tab)
 
 if __name__ == '__main__':
     main()

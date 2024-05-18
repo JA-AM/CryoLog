@@ -51,7 +51,7 @@ def callback(frame: av.VideoFrame) -> av.VideoFrame:
     return av.VideoFrame.from_ndarray(img, format="bgr24")
 
 def camera(db):
-    st.subheader("Barcode Scanner")
+    st.header("Barcode Scanner")
     st.markdown("""<span style='color: #779ecb;'>✦ ✦ ✦ ✦""", unsafe_allow_html=True)
 
     account_sid = st.secrets['TWILIO_ACCOUNT_SID']
