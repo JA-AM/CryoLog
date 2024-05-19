@@ -9,11 +9,15 @@ from components.login import login
 from components.camera import camera
 from st_on_hover_tabs import on_hover_tabs
 import time
+    
+image_paths = ["logo", "favicon", "banner"]
+images = {}
 
-with open("images/cryolog_logo.svg", "r") as file:
-    logo = file.read()
+for path in image_paths:
+    with open(f'images/{path}.svg', "r") as f:
+        images[path] = f.read()
 
-st.set_page_config(layout="wide", page_icon=logo, page_title="CryoLog")
+st.set_page_config(layout="wide", page_icon=images["favicon"], page_title="CryoLog")
 st.markdown('<style>' + open('./css/style.css').read() + '</style>', unsafe_allow_html=True)
 cookie_manager = CookieController()
 
@@ -42,11 +46,7 @@ def firebase_setup():
     return auth, db
 
 def display_header():
-    col1, col2 = st.columns([1, 5])
-    with col1:
-        st.image(logo, width=90)
-    with col2:
-        st.title("C R Y O L O G")
+    st.image(images["banner"], width=300)
     st.markdown('<hr class="divider">', unsafe_allow_html=True)
 
 def display_sidebar(auth, db, default_tab):
