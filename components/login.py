@@ -134,7 +134,8 @@ def login(auth, db, cookie_manager):
             st.query_params.clear()
             st.switch_page("app.py")
         except requests.exceptions.HTTPError as e:
-            st.error("Something went wrong. Please try again.")
+            st.error(e)
+            # st.error("Something went wrong. Please try again.")
         
     
 def email_in_db(email, db):
