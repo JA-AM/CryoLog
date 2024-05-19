@@ -266,7 +266,7 @@ def chat(db):
             background-color: #111111;
             border: 0.1px solid #222e3b2;
             border-radius: 0.5rem;
-            padding: calc(1em - 1px);
+            padding: 1em;
         }
         """
         ):
