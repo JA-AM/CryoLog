@@ -1,4 +1,5 @@
 import streamlit as st
+from streamlit_extras.stylable_container import stylable_container
 from streamlit_cookies_controller import CookieController
 import firebase
 from components.profile import profile
@@ -41,11 +42,11 @@ def firebase_setup():
     return auth, db
 
 def display_header():
-    col1, col2 = st.columns([1, 6])
+    col1, col2 = st.columns([1, 5])
     with col1:
-        st.image(logo, use_column_width=True)
+        st.image(logo, width=90)
     with col2:
-        st.title("CryoLog")
+        st.title("C R Y O L O G")
     st.markdown('<hr class="divider">', unsafe_allow_html=True)
 
 def display_sidebar(auth, db, default_tab):
@@ -70,29 +71,42 @@ def display_sidebar(auth, db, default_tab):
         chat(db)
 
 def home():
-    st.header("Home")
-    st.markdown("""<span style='color: #779ecb; font-size: 1.5em;'>✦ ✦ ✦ ✦""", unsafe_allow_html=True)
-    st.markdown("**Welcome to CryoLog, your chilly grocery list powered by Streamlit and Snowflake Arctic!**")
-    with st.expander("What is CryoLog?"):
-        st.markdown("""
-                 CryoLog is your all-in-one solution for optimizing your
-                nutrition and enhancing your well-being. Utilizing cutting-edge machine 
-                learning technology, Cryolog empowers you to cultivate healthier eating 
-                habits, streamline your shopping experience, and achieve peak nutrient 
-                intake effortlessly. (gpt blurb, replace with actual person speak)
-                 """)
-    
-    with st.expander('Lebronify'):
-        st.image('https://a3.espncdn.com/combiner/i?img=%2Fi%2Fheadshots%2Fnba%2Fplayers%2Ffull%2F1966.png')
-        st.write('image replace with smth small or uncontrasting, break up text')
-        st.write('Say goodbye to guesswork and hello to precision with Cryolog\'s personalized \
-                recommendations tailored to your unique dietary needs and wellness goals. Whether \
-                you\'re striving to manage weight, increase energy levels, or simply cultivate a \
-                healthier lifestyle, Cryolog provides you with actionable insights and guidance every \
-                step of the way. (more gpt speak, remember to replace)')
-    #st.markdown("""<span style='color: #779ecb;'>✦ ✦ ✦ ✦""", unsafe_allow_html=True)
-    st.write('With Cryolog, the journey to a healthier you is simplified, efficient, and \
-                enjoyable. Take the first step towards unlocking your full potential with Cryolog today')
+    with stylable_container(
+        key = "homecontainer",
+        css_styles= """
+        {
+            background-color: #111111;
+            border: 0.1px solid #222e3b;
+            border-radius: 0.5rem;
+            padding: 1em;
+            margin:
+        }
+        """
+        ):
+        with st.container():
+            st.header("Home")
+            st.markdown("""<span style='color: #779ecb; font-size: 1.5em;'>✦ ✦ ✦ ✦""", unsafe_allow_html=True)
+            st.markdown("**Welcome to CryoLog, your chilly grocery list powered by Streamlit and Snowflake Arctic!**")
+            with st.expander("What is CryoLog?"):
+                st.markdown("""
+                        CryoLog is your all-in-one solution for optimizing your
+                        nutrition and enhancing your well-being. Utilizing cutting-edge machine 
+                        learning technology, Cryolog empowers you to cultivate healthier eating 
+                        habits, streamline your shopping experience, and achieve peak nutrient 
+                        intake effortlessly. (gpt blurb, replace with actual person speak)
+                        """)
+            
+            with st.expander('Lebronify'):
+                st.image('https://a3.espncdn.com/combiner/i?img=%2Fi%2Fheadshots%2Fnba%2Fplayers%2Ffull%2F1966.png')
+                st.write('image replace with smth small or uncontrasting, break up text')
+                st.write('Say goodbye to guesswork and hello to precision with Cryolog\'s personalized \
+                        recommendations tailored to your unique dietary needs and wellness goals. Whether \
+                        you\'re striving to manage weight, increase energy levels, or simply cultivate a \
+                        healthier lifestyle, Cryolog provides you with actionable insights and guidance every \
+                        step of the way. (more gpt speak, remember to replace)')
+            #st.markdown("""<span style='color: #779ecb;'>✦ ✦ ✦ ✦""", unsafe_allow_html=True)
+            st.write('With Cryolog, the journey to a healthier you is simplified, efficient, and \
+                        enjoyable. Take the first step towards unlocking your full potential with Cryolog today')
 def main():
     auth, db = firebase_setup()
     get_state_from_cookie()

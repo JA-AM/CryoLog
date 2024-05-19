@@ -1,5 +1,6 @@
 import streamlit as st
 import requests
+from streamlit_extras.stylable_container import stylable_container
 from streamlit.components.v1 import html
 
 
@@ -14,20 +15,50 @@ def login(auth, db, cookie_manager):
         st.write(nav_script, unsafe_allow_html=True)
 
     with col2:
-        login_form = st.form("Login to Existing Account")
-        login_form.subheader("Login")
-        email = login_form.text_input("Email")
-        password = login_form.text_input("Password", type="password")
-        login = login_form.form_submit_button("Login")
+        with stylable_container(
+        key = "logincontainer",
+        css_styles= """
+        {
+            background-color: #111111;
+            border: 0.1px solid #222e3b;
+            border-radius: 0.5rem;
+        }
+        """
+        ):
+            login_form = st.form("Login to Existing Account")
+            login_form.subheader("Login")
+            email = login_form.text_input("Email", placeholder='joe@gmail.com')
+            password = login_form.text_input("Password", type="password",placeholder='*****')
+            login = login_form.form_submit_button("Login")
 
-        reset_form = st.form("Reset Password", clear_on_submit=True)
-        reset_form.subheader("Forgot Password?")
-        email_for_reset = reset_form.text_input("Email", key="reset_email")
-        reset = reset_form.form_submit_button("Send password reset email")
+        with stylable_container(
+        key = "resetcontainer",
+        css_styles= """
+        {
+            background-color: #111111;
+            border: 0.1px solid #222e3b2;
+            border-radius: 0.5rem;
+        }
+        """
+        ):
+            reset_form = st.form("Reset Password", clear_on_submit=True)
+            reset_form.subheader("Forgot Password?")
+            email_for_reset = reset_form.text_input("Email", key="reset_email", placeholder='joe@gmail.com')
+            reset = reset_form.form_submit_button("Send password reset email")
 
-        google_form = st.form("Sign in with Google")
-        google_form.subheader("Sign in with Google")
-        google_form.form_submit_button("Sign in", on_click=handle_google_request)
+        with stylable_container(
+        key = "googlefcontainer",
+        css_styles= """
+        {
+            background-color: #111111;
+            border: 0.1px solid #222e3b2;
+            border-radius: 0.5rem;
+        }
+        """
+        ):
+            google_form = st.form("Sign in with Google")
+            google_form.subheader("Sign in with Google")
+            google_form.form_submit_button("Sign in", on_click=handle_google_request)
 
     if login and email and password:
         try:
@@ -49,13 +80,23 @@ def login(auth, db, cookie_manager):
             st.error("Account doesn't exist!")
     
     with col1:
-        signup_form = st.form("Sign Up")
-        signup_form.subheader("Create New Account")
-        newEmail = signup_form.text_input("Email", key="new_email")
-        newUsername = signup_form.text_input("Username")
-        newPassword = signup_form.text_input("Password", key="new_password", type="password")
-        confirmPassword = signup_form.text_input("Confirm password", type="password")
-        create = signup_form.form_submit_button("Create Account")
+        with stylable_container(
+        key = "createcontainer",
+        css_styles= """
+        {
+            background-color: #111111;
+            border: 0.1px solid #222e3b2;
+            border-radius: 0.5rem;
+        }
+        """
+        ):
+            signup_form = st.form("Sign Up")
+            signup_form.subheader("Create New Account")
+            newEmail = signup_form.text_input("Email", key="new_email", placeholder='joe@gmail.com')
+            newUsername = signup_form.text_input("Username", placeholder='joe123')
+            newPassword = signup_form.text_input("Password", key="new_password", type="password", placeholder='*****')
+            confirmPassword = signup_form.text_input("Confirm password", type="password", placeholder='*****')
+            create = signup_form.form_submit_button("Create Account")
 
     if create and newEmail and newUsername and newPassword and confirmPassword:
         if newPassword!=confirmPassword:

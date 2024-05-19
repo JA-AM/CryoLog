@@ -1,4 +1,5 @@
 from streamlit_webrtc import WebRtcMode, webrtc_streamer
+from streamlit_extras.stylable_container import stylable_container
 from twilio.rest import Client
 import cv2
 from pyzbar.pyzbar import decode
@@ -51,31 +52,52 @@ def callback(frame: av.VideoFrame) -> av.VideoFrame:
     return av.VideoFrame.from_ndarray(img, format="bgr24")
 
 def camera(db):
-    st.header("Barcode Scanner")
-    st.markdown("""<span style='color: #779ecb;'>✦ ✦ ✦ ✦""", unsafe_allow_html=True)
+    with stylable_container(
+        key = "scannedtitlecontainer",
+        css_styles= """
+        {
+            background-color: #111111;
+            border: 0.1px solid #222e3b;
+            border-radius: 0.5rem;
+            padding: calc(1em);
+        }
+        """
+        ):
+        st.header("Barcode Scanner")
+        st.markdown("""<span style='color: #779ecb;'>✦ ✦ ✦ ✦""", unsafe_allow_html=True)
 
-    account_sid = st.secrets['TWILIO_ACCOUNT_SID']
-    auth_token = st.secrets['TWILIO_AUTH_TOKEN']
-    client = Client(account_sid, auth_token)
+        account_sid = st.secrets['TWILIO_ACCOUNT_SID']
+        auth_token = st.secrets['TWILIO_AUTH_TOKEN']
+        client = Client(account_sid, auth_token)
 
-    token = client.tokens.create()
-    
-    with st.container(border=True):
-        webrtc_ctx = webrtc_streamer(
-            key="opencv-filter",
-            mode=WebRtcMode.SENDRECV,
-            rtc_configuration={
-                "iceServers": token.ice_servers,
-                "iceTransportPolicy": "relay"
-            },
-            video_frame_callback=callback,
-            media_stream_constraints={"video": True, "audio": False},
-            async_processing=True
+        token = client.tokens.create()
+
+        with st.container():
+            webrtc_ctx = webrtc_streamer(
+                key="opencv-filter",
+                mode=WebRtcMode.SENDRECV,
+                rtc_configuration={
+                    "iceServers": token.ice_servers,
+                    "iceTransportPolicy": "relay"
+                },
+                video_frame_callback=callback,
+                media_stream_constraints={"video": True, "audio": False},
+                async_processing=True
         )
 
     if not webrtc_ctx.state.playing:
-        st.subheader("Scanned Items")
-        with st.container(border=True):
+        with stylable_container(
+        key = "scannedcontainer",
+        css_styles= """
+        {
+            background-color: #111111;
+            border: 0.1px solid #222e3b;
+            border-radius: 0.5rem;
+            padding: calc(1em);
+        }
+        """
+        ):
+            st.subheader("Scanned Items")
             display_items(db, detected_barcodes, is_barcode=True)
 
 if __name__ == "__main__":

@@ -2,22 +2,22 @@
 
 .stApp{
     margin: auto;
-    background: linear-gradient(-45deg, #dff7fa, #abd1f3, #BAF2EF);
+    background: linear-gradient(45deg, #111111, #111111, #6694cb);
     overflow: auto;
-    animation: gradient 15s ease infinite;
+    animation: gradient 30s ease infinite;
     background-size: 400% 400%;
     background-attachment: fixed;
 }
 
 @keyframes gradient {
     0% {
-		background-position: 0% 50%;
+		background-position: 0% 0%;
 	}
 	50% {
-		background-position: 100% 50%;
+		background-position: 100% 0%;
 	}
 	100% {
-		background-position: 0% 50%;
+		background-position: 0% 0%;
 	}
 }
 h1 {
