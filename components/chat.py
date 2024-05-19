@@ -308,7 +308,7 @@ def chat(db):
                             status.update(label="Answer prepared!", state="complete", expanded=True)
         
         with nutritionist:
-            with st.container(border=True):
+            with st.container():
                 with st.chat_message('assistant', avatar='🐧'):
                     st.write('Ask me to learn more about specific ingredients!')
                 nutr_question = st.chat_input(placeholder="arabinoxylan")
@@ -322,7 +322,7 @@ def chat(db):
                             display_response(nutr_question, use_rag, nutr_option_index, db)
                             status.update(label="Ready for review!", state="complete", expanded=True)
         with shopper:
-            with st.container(border=True):
+            with st.container():
                 with st.chat_message('assistant', avatar='☃️'):
                     st.write('I can help with your shopping list!')
                 shop_question = st.chat_input(placeholder="Generate a list for me!")
