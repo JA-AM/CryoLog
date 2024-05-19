@@ -132,7 +132,10 @@ def profile(auth, db, cookie_manager):
         with c1:
             with st.container(border=True):
                 st.write("Change Username")
-                username = st.text_input('Current Username',value=user_data['Username'], key='username')
+                if 'Username' in user_data:
+                    username = st.text_input('Current Username',value=user_data['Username'], key='username')
+                else:
+                    username = st.text_input('Current Username',value="", key='emptyUsername')
                 if st.button("Save"):
                     st.toast("Account settings saved")
                     db.child("users").child(currUser["localId"]).child("Username").set(username)
