@@ -2,17 +2,14 @@ import streamlit as st
 import requests
 from streamlit_extras.stylable_container import stylable_container
 from streamlit.components.v1 import html
+from streamlit_oauth import OAuth2Component
+import json
+import base64
+import re
 
 
 def login(auth, db, cookie_manager):
     col1, col2 = st.columns([1,1])
-
-    def handle_google_request():
-        auth_url = auth.authenticate_login_with_google()
-        nav_script = """
-        <meta http-equiv="refresh" content="0; url='%s'">
-        """ % (auth_url)
-        st.write(nav_script, unsafe_allow_html=True)
 
     with col2:
         with stylable_container(
@@ -56,9 +53,21 @@ def login(auth, db, cookie_manager):
         }
         """
         ):
-            google_form = st.form("Sign in with Google")
-            google_form.subheader("Sign in with Google")
-            google_form.form_submit_button("Sign in", on_click=handle_google_request)
+            st.subheader("Sign in with Google")
+            oauth2 = OAuth2Component(
+                st.secrets['client_id'],
+                st.secrets['client_secret'],
+                "https://accounts.google.com/o/oauth2/v2/auth",
+                "https://oauth2.googleapis.com/token",
+                "https://oauth2.googleapis.com/token",
+                "https://oauth2.googleapis.com/revoke",
+            )
+            result = oauth2.authorize_button(
+                name="Sign in",
+                redirect_uri=st.secrets["redirect_uris"],
+                scope="email profile",
+                key="google"
+            )
 
     if login and email and password:
         try:
@@ -122,22 +131,21 @@ def login(auth, db, cookie_manager):
                 else:
                     st.error(err)
 
-    if len(st.query_params)>4:
-        try:
-            url = st.secrets['redirect_uris'] + "?"
-            for key in st.query_params:
-                url+=key+"="+st.query_params[key]+"&"
-            url = url[:-1]
-            user = auth.sign_in_with_oauth_credential(url)
-            db.child("users").child(user["localId"]).child("Email").set(user['email'])
-            cookie_manager.set("session_state_save", user)
-            st.query_params.clear()
-            st.switch_page("app.py")
-        except requests.exceptions.HTTPError as e:
-            st.error(e)
-            # st.error("Something went wrong. Please try again.")
-        
-    
+
+    if result:
+        id_token = result["token"]["id_token"]
+        user = id_token.split(".")[1]
+        user += "=" * (-len(user) % 4)
+        user = json.loads(base64.b64decode(user))
+
+        id = re.sub(r'\W+', '', user['email'])
+        user['localId'] = id
+
+        db.child("users").child(user["localId"]).child("Email").set(user['email'])
+        db.child("users").child(user["localId"]).child("Username").set(user['name'])
+        cookie_manager.set("session_state_save", user)
+        st.switch_page("app.py")
+
 def email_in_db(email, db):
     users = db.child("users").get()
     for user in users.each():

@@ -12,3 +12,4 @@ streamlit_webrtc
 markdown
 plotly
 streamlit_extras
+streamlit_oauth
