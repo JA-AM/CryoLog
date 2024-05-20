@@ -1,4 +1,5 @@
 import streamlit as st
+from streamlit_extras.stylable_container import stylable_container
 from streamlit_tags import st_tags
 from datetime import date
 
@@ -13,7 +14,7 @@ def biometrics_numeric_form(label, preset_value):
         with st.container(border=True):
             c1, c2 = st.columns([4.6,1.3])
             with c1:
-                new_value = st.text_input(label, value=preset_value, key=label+'input')
+                new_value = st.text_input(label, value=preset_value, placeholder='Input '+label, key=label+'input')
             with c2:
                 if label == 'Weight':
                     selection = st.selectbox('Unit', ('kg', 'lb'), index={'kg': 0, 'lb': 1}.get(unit_selection, 0))
@@ -36,8 +37,20 @@ def profile(auth, db, cookie_manager):
     else:        
         username =  db.child("users").child(currUser['localId']).get().val()["Email"]
         username = username.split("@")[0]
-    st.header("Profile")
-    st.markdown("""<span style='color: #779ecb;'>✦ ✦ ✦ ✦""", unsafe_allow_html=True)
+
+    with stylable_container(
+        key = "profiletitlecontainer",
+        css_styles= """
+        {
+            background-color: #111111;
+            border: 0.1px solid #222e3b;
+            border-radius: 0.5rem;
+            padding: calc(1em - 1px);
+        }
+        """
+        ):
+        st.header("Profile")
+        st.markdown("""<span style='color: #779ecb;'>✦ ✦ ✦ ✦""", unsafe_allow_html=True)
 
     user_data = db.child("users").child(currUser["localId"]).get().val()
     
@@ -51,7 +64,17 @@ def profile(auth, db, cookie_manager):
     preset_preferences = user_data.get('Preferences', [])
 
     # Biometrics Form
-    with st.container(border=True):
+    with stylable_container(
+        key = "profilecontainer",
+        css_styles= """
+        {
+            background-color: #111111;
+            border: 0.1px solid #222e3b;
+            border-radius: 0.5rem;
+            padding: calc(1em - 1px);
+        }
+        """
+        ):
         st.markdown('### My Biometrics')
         with st.form('biometrics_form', border=False):
             with st.container(border=True):         
@@ -93,7 +116,17 @@ def profile(auth, db, cookie_manager):
                     st.toast("Biometrics Saved")
     
     # Preferences Form
-    with st.form('pref_form', border=True):
+    with stylable_container(
+        key = "profilecontainer",
+        css_styles= """
+        {
+            background-color: #111111;
+            border: 0.1px solid #222e3b;
+            border-radius: 0.5rem;
+            padding: calc(1em - 1px);
+        }
+        """
+        ):
         st.markdown('### My Preferences and Goals')
 
         c1, c2 = st.columns([1,1])
@@ -120,13 +153,23 @@ def profile(auth, db, cookie_manager):
                     key='goals'
                     )            
 
-        if st.form_submit_button("Save"):
+        if st.button("Save", key="prefgoalsbtn"):
             db.child("users").child(currUser["localId"]).child("Preferences").set(preferences)
             db.child("users").child(currUser["localId"]).child("Goals").set(goals)
             st.toast("Preferences and Goals Saved")
     
     # Account Settings
-    with st.container(border=True):
+    with stylable_container(
+        key = "profilecontainer",
+        css_styles= """
+        {
+            background-color: #111111;
+            border: 0.1px solid #222e3b;
+            border-radius: 0.5rem;
+            padding: calc(1em - 1px);
+        }
+        """
+        ):
         st.markdown('### Account Settings')
         c1, c2 = st.columns([1,1])
         with c1:
@@ -145,10 +188,8 @@ def profile(auth, db, cookie_manager):
                 if st.button("Reset Password"):
                     st.toast("Reset password email sent")
                     auth.send_password_reset_email(user_data['Email'])
+        st.markdown("""<span style='color: #779ecb;'>✦ ✦ ✦ ✦""", unsafe_allow_html=True)
                     
-
-
-    st.markdown("""<span style='color: #779ecb;'>✦ ✦ ✦ ✦""", unsafe_allow_html=True)
     st.divider()
     if st.button('Log Out', key='logoutbtn'):
         cookie_manager.remove("session_state_save")

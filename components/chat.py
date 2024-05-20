@@ -1,5 +1,6 @@
 import streamlit as st
 from snowflake.snowpark.session import Session
+from streamlit_extras.stylable_container import stylable_container
 import pandas as pd
 import markdown
 import time
@@ -258,62 +259,83 @@ def display_shopper_response(question, db):
     return final_output
 
 def chat(db):
-    st.header("Chat With Snowflake Arctic Helpers")
-    st.markdown("""<span style='color: #779ecb;'>✦ ✦ ✦ ✦""", unsafe_allow_html=True)
-    st.markdown("**Ask any one of our helpers about general dietary information, understanding \
-                complicated nutritional terms, or finding foods based on your needs!**")
-    rag = st.toggle('Use Context? (Recommended)', value=True)
+    with stylable_container(
+        key = "chatintrocontainer",
+        css_styles= """
+        {
+            background-color: #111111;
+            border: 0.1px solid #222e3b2;
+            border-radius: 0.5rem;
+            padding: 1em;
+        }
+        """
+        ):
+        st.header("Chat With Snowflake Arctic Helpers")
+        st.markdown("""<span style='color: #779ecb;'>✦ ✦ ✦ ✦""", unsafe_allow_html=True)
+        st.markdown("**Ask any one of our helpers about general dietary information, understanding \
+                    complicated nutritional terms, or finding foods based on your needs!**")
+        rag = st.toggle('Use Context? (Recommended)', value=True)
 
-    if rag:
-        use_rag = 1
-    else:
-        use_rag = 0
-    
-    dietitian, nutritionist, shopper = st.tabs(['Dave the Dietitian', 'Neil the Nutritionist', 'Sarah the Shopper'])
-    with dietitian:
-        with st.container(border=True):
-            with st.chat_message('assistant', avatar='🐻‍❄️'):
-                st.write('I provide general nutritional advice!')
-            diet_question = st.chat_input(placeholder="What is an example of a healthy breakfast?")
-            diet_option_index = 0
-            if diet_question:
-                with st.container(border=True):
-                    st.markdown("""<span style='color: #779ecb; font-size: 1.5em;'>✦ </span><b style='font-size: 1.5em;'>Dietitian""", unsafe_allow_html=True)
-                    with st.chat_message('user'):
-                        st.write(diet_question)
-                    with st.status('Cooking something up...', expanded=True) as status:
-                        display_response(diet_question, use_rag, diet_option_index, db)
-                        status.update(label="Answer prepared!", state="complete", expanded=True)
-    
-    with nutritionist:
-        with st.container(border=True):
-            with st.chat_message('assistant', avatar='🐧'):
-                st.write('Ask me to learn more about specific ingredients!')
-            nutr_question = st.chat_input(placeholder="arabinoxylan")
-            nutr_option_index = 1
-            if nutr_question:
-                with st.container(border=True):
-                    st.markdown("""<span style='color: #779ecb; font-size: 1.5em;'>✦ </span><b style='font-size: 1.5em;'>Nutritionist""", unsafe_allow_html=True)
-                    with st.chat_message('user'):
-                        st.write(nutr_question)
-                    with st.status('Taste testing...', expanded=True) as status:
-                        display_response(nutr_question, use_rag, nutr_option_index, db)
-                        status.update(label="Ready for review!", state="complete", expanded=True)
-    with shopper:
-        with st.container(border=True):
-            with st.chat_message('assistant', avatar='☃️'):
-                st.write('I can help with your shopping list!')
-            shop_question = st.chat_input(placeholder="Generate a list for me!")
-            shop_option_index = 2
-            if shop_question:
-                with st.container(border=True):
-                    st.markdown("""<span style='color: #779ecb; font-size: 1.5em;'>✦ </span><b style='font-size: 1.5em;'>Shopper""", unsafe_allow_html=True)
-                    with st.chat_message('user'):
-                        st.write(shop_question)
-                    with st.status('Browsing...', expanded=True) as status:
-                        suggested_items = display_shopper_response(shop_question, db)
-                        status.update(label="Found suggestions!", state="complete", expanded=True)
-                    display_items(db, suggested_items)
+        if rag:
+            use_rag = 1
+        else:
+            use_rag = 0
+    with stylable_container(
+        key = "chatcontainer",
+        css_styles= """
+        {
+            background-color: #111111;
+            border: 0.1px solid #222e3b2;
+            border-radius: 0.5rem;
+            padding: calc(1em - 1px);
+        }
+        """
+        ):
+        dietitian, nutritionist, shopper = st.tabs(['Dave the Dietitian', 'Neil the Nutritionist', 'Sarah the Shopper'])
+        with dietitian:
+            with st.container():
+                with st.chat_message('assistant', avatar='🐻‍❄️'):
+                    st.write('I provide general nutritional advice!')
+                diet_question = st.chat_input(placeholder="What is an example of a healthy breakfast?")
+                diet_option_index = 0
+                if diet_question:
+                    with st.container(border=True):
+                        st.markdown("""<span style='color: #779ecb; font-size: 1.5em;'>✦ </span><b style='font-size: 1.5em;'>Dietitian""", unsafe_allow_html=True)
+                        with st.chat_message('user'):
+                            st.write(diet_question)
+                        with st.status('Cooking something up...', expanded=True) as status:
+                            display_response(diet_question, use_rag, diet_option_index, db)
+                            status.update(label="Answer prepared!", state="complete", expanded=True)
+        
+        with nutritionist:
+            with st.container():
+                with st.chat_message('assistant', avatar='🐧'):
+                    st.write('Ask me to learn more about specific ingredients!')
+                nutr_question = st.chat_input(placeholder="arabinoxylan")
+                nutr_option_index = 1
+                if nutr_question:
+                    with st.container(border=True):
+                        st.markdown("""<span style='color: #779ecb; font-size: 1.5em;'>✦ </span><b style='font-size: 1.5em;'>Nutritionist""", unsafe_allow_html=True)
+                        with st.chat_message('user'):
+                            st.write(nutr_question)
+                        with st.status('Taste testing...', expanded=True) as status:
+                            display_response(nutr_question, use_rag, nutr_option_index, db)
+                            status.update(label="Ready for review!", state="complete", expanded=True)
+        with shopper:
+            with st.container():
+                with st.chat_message('assistant', avatar='☃️'):
+                    st.write('I can help with your shopping list!')
+                shop_question = st.chat_input(placeholder="Generate a list for me!")
+                shop_option_index = 2
+                if shop_question:
+                    with st.container(border=True):
+                        st.markdown("""<span style='color: #779ecb; font-size: 1.5em;'>✦ </span><b style='font-size: 1.5em;'>Shopper""", unsafe_allow_html=True)
+                        with st.chat_message('user'):
+                            st.write(shop_question)
+                        with st.status('Browsing...', expanded=True) as status:
+                            suggested_items = display_shopper_response(shop_question, db)
+                            status.update(label="Found suggestions!", state="complete", expanded=True)
+                        display_items(db, suggested_items)
     # if selected_option == 'General Nutritional Advice':
     #     question = st.text_input("Enter question", placeholder="What is an example of a healthy breakfast?", label_visibility="collapsed")
     #     option_index = 0

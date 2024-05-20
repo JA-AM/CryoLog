@@ -11,3 +11,4 @@ firebase-rest-api
 streamlit_webrtc
 markdown
 plotly
+streamlit_extras
