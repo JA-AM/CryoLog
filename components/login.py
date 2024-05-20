@@ -124,7 +124,7 @@ def login(auth, db, cookie_manager):
 
     if len(st.query_params)>4:
         try:
-            url = "https://cryolog-jaam.streamlit.app/?"
+            url = st.secrets['redirect_uris'] + "?"
             for key in st.query_params:
                 url+=key+"="+st.query_params[key]+"&"
             url = url[:-1]
