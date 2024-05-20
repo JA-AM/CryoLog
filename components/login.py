@@ -4,10 +4,10 @@ from streamlit.components.v1 import html
 
 
 def login(auth, db, cookie_manager):
-    auth_url = auth.authenticate_login_with_google()
     col1, col2 = st.columns([1,1])
 
     def handle_google_request():
+        auth_url = auth.authenticate_login_with_google()
         nav_script = """
         <meta http-equiv="refresh" content="0; url='%s'">
         """ % (auth_url)
@@ -83,7 +83,7 @@ def login(auth, db, cookie_manager):
 
     if len(st.query_params)>4:
         try:
-            url = "https://localhost:8501/?"
+            url = "https://cryolog-jaam.streamlit.app/?"
             for key in st.query_params:
                 url+=key+"="+st.query_params[key]+"&"
             url = url[:-1]
