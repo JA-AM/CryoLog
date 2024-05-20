@@ -10,7 +10,7 @@ from components.camera import camera
 from st_on_hover_tabs import on_hover_tabs
 import time
     
-image_paths = ["logo", "favicon", "banner"]
+image_paths = ["logo", "favicon", "banner", "Dave", "Niel", "Sarah"]
 images = {}
 
 for path in image_paths:
@@ -68,7 +68,7 @@ def display_sidebar(auth, db, default_tab):
     elif tabs == 'My List':
         search(db)
     elif tabs == 'Chat':
-        chat(db)
+        chat(db, images)
 
 def home():
     with stylable_container(
@@ -88,25 +88,32 @@ def home():
             st.markdown("""<span style='color: #779ecb; font-size: 1.5em;'>✦ ✦ ✦ ✦""", unsafe_allow_html=True)
             st.markdown("**Welcome to CryoLog, your chilly grocery list powered by Streamlit and Snowflake Arctic!**")
             with st.expander("What is CryoLog?"):
+                st.image(images['logo'], width=50)
                 st.markdown("""
                         CryoLog is your all-in-one solution for optimizing your
                         nutrition and enhancing your well-being. Utilizing cutting-edge machine 
-                        learning technology, Cryolog empowers you to cultivate healthier eating 
+                        learning technology, CryoLog empowers you to cultivate healthier eating 
                         habits, streamline your shopping experience, and achieve peak nutrient 
-                        intake effortlessly. (gpt blurb, replace with actual person speak)
+                        intake effortlessly.
                         """)
             
-            with st.expander('Lebronify'):
-                st.image('https://a3.espncdn.com/combiner/i?img=%2Fi%2Fheadshots%2Fnba%2Fplayers%2Ffull%2F1966.png')
-                st.write('image replace with smth small or uncontrasting, break up text')
-                st.write('Say goodbye to guesswork and hello to precision with Cryolog\'s personalized \
-                        recommendations tailored to your unique dietary needs and wellness goals. Whether \
-                        you\'re striving to manage weight, increase energy levels, or simply cultivate a \
-                        healthier lifestyle, Cryolog provides you with actionable insights and guidance every \
-                        step of the way. (more gpt speak, remember to replace)')
+            with st.expander('How was CryoLog built?'):
+                st.image(images['logo'], width=50)
+                st.markdown("""
+                        Utilizing Streamlit for frontend, and components like OpenCV and streamlit-webrtc for barcode scanning,
+                        the app seamlessly integrates with the FoodData Central API to provide detailed product information.
+                        On the backend, Snowflake Arctic LLM is employed via Snowflake Cortex,
+                        leveraging Retrieval-Augmented Generation (RAG) for contextually accurate responses based on user data and private nutritional documents.
+                        The app ensures secure login, efficient data management, and personalized recommendations,
+                        offering significant benefits for user engagement, healthcare providers, and retail integration,
+                        while providing valuable insights into nutritional trends and consumer behavior.
+                        """)
+                # TODO add full documentation link
+                st.link_button("Link to Full Documentation", 'https://streamlit.io')
+            
             #st.markdown("""<span style='color: #779ecb;'>✦ ✦ ✦ ✦""", unsafe_allow_html=True)
-            st.write('With Cryolog, the journey to a healthier you is simplified, efficient, and \
-                        enjoyable. Take the first step towards unlocking your full potential with Cryolog today')
+            st.markdown("""**With Cryolog, the journey to a healthier you is simplified, efficient, and enjoyable.
+                         Take the first step towards unlocking your full potential with CryoLog today!**""")
 def main():
     auth, db = firebase_setup()
     get_state_from_cookie()

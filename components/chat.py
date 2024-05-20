@@ -258,7 +258,7 @@ def display_shopper_response(question, db):
     
     return final_output
 
-def chat(db):
+def chat(db, images):
     with stylable_container(
         key = "chatintrocontainer",
         css_styles= """
@@ -294,7 +294,7 @@ def chat(db):
         dietitian, nutritionist, shopper = st.tabs(['Dave the Dietitian', 'Neil the Nutritionist', 'Sarah the Shopper'])
         with dietitian:
             with st.container():
-                with st.chat_message('assistant', avatar='🐻‍❄️'):
+                with st.chat_message('assistant', avatar=images['Dave']):
                     st.write('I provide general nutritional advice!')
                 diet_question = st.chat_input(placeholder="What is an example of a healthy breakfast?")
                 diet_option_index = 0
@@ -309,7 +309,7 @@ def chat(db):
         
         with nutritionist:
             with st.container():
-                with st.chat_message('assistant', avatar='🐧'):
+                with st.chat_message('assistant', avatar=images['Niel']):
                     st.write('Ask me to learn more about specific ingredients!')
                 nutr_question = st.chat_input(placeholder="arabinoxylan")
                 nutr_option_index = 1
@@ -323,7 +323,7 @@ def chat(db):
                             status.update(label="Ready for review!", state="complete", expanded=True)
         with shopper:
             with st.container():
-                with st.chat_message('assistant', avatar='☃️'):
+                with st.chat_message('assistant', avatar=images['Sarah']):
                     st.write('I can help with your shopping list!')
                 shop_question = st.chat_input(placeholder="Generate a list for me!")
                 shop_option_index = 2
