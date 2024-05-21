@@ -50,14 +50,51 @@ StreamLit
 ├───plotly
 ```
 ## Backend
-## LLM
+### Login and Authentication
+>Authentication is implemented using Firebase, allowing users to manage their data with an email and password. Additionally, OAuth 2.0 is integrated to enable Google account sign-ins. This combination ensures a secure and user-friendly authentication process.
+
+### Barcode Scanner
+>A key feature of this project is the barcode scanner, which enables users to interact directly with their products. We used the `streamlit-webrtc` component to stream video in the Streamlit Community Cloud. Image frames are processed with OpenCV and Pyzbar to decode barcodes, with scanned items displayed after the streaming stops.
+
+### FoodData API
+>We use the FoodData Central API to generate list items, providing detailed nutritional information and more. The GET search endpoint retrieves initial product data, while the GET endpoint with the FDC ID fetches comprehensive details for each item.
+
+## LLM Integration
+>### Snowflake Cortex
+>We chose Snowflake Cortex for accessing the Snowflake Arctic LLM due to its functionality and compatibility with RAG. Cortex offers multiple LLM functions and integrates well with the Snowflake Client, facilitating direct use of the Snowflake database.
+
+### Retrieval-Augmented Generation (RAG)
+>RAG is used to enhance LLM responses using our dataset, improving accuracy without tuning model weights. 
+
+**Setup:**
+> 1. Create database and schema in Snowflake.
+> 2. Organize private documents.
+> 3. Create preprocessing functions.
+> 4. Build the vector database.
+
+**Documents:**
+> - Nutritional information from USAID
+> - Dietary Guidelines 2010
+> - Ingredients information from WebMD (scraped)
+
+### Usage
+>The LLM is used in three main ways:
+>1. **Nutritional and dietary advice**: Generates advice based on user biometric data and contextual information.
+>2. **Ingredient information overviews**: Provides simplified overviews using SQL search results.
+>3. **Grocery lists and alternatives**: Generates lists or alternatives by integrating Snowflake Arctic with the FoodData API through multi-step processing.
+
+**List Generation Process:**
+>- **Prompt 1**: Generates a list of query searches based on user info and prompt question.
+>- **FoodData API**: Executes queries and returns relevant product information.
+>- **Prompt 2**: Selects the best options based on user info and extracted data.
 
 # Obstacles faced 🚧
 > * Streamlit's high-level programming prevented a lot of customizability when it came down to stylization
-> * 
+> * The lack of a native implementation of a camera streaming component led to a search of the custom component `streamlit-webrtc` which was not functional at first. It took many hours of debugging and reading forums to figure out that Streamlit version 1.33 with an external server made the component work for us.
+> * On deployment we had many troubles with Google authentication, and we struggled to figure out why it worked locally but not on the cloud. We eventually switched to a different component for Google authentication which solved the issue.
 
 # Impacts 💥
-> CryoLog has the potential to go beyond a demo app created for a one-off hackathon. The real world impacts may include:
+> CryoLog has the potential to go beyond a demo app created for a one-off hackathon. The real-world impacts may include:
 
 > ## User Engagement and Retention
 > **Enhanced User Experience**: With streamlined barcode scanning, personalized nutritional advice, and dynamic grocery list generation, users will likely find the app highly useful, leading to increased engagement and retention.
@@ -108,3 +145,12 @@ StreamLit
 
 
 # Closing Statements 👋
+>We want to emphasize that CryoLog is more than just a grocery list application; it is a comprehensive tool designed to enhance your shopping experience and promote healthier eating habits.
+
+>As we look to the future, we are committed to continuously improving CryoLog, addressing user feedback, and exploring new ways to make the app even more valuable. Whether you are a busy professional, a health-conscious individual, or someone looking to optimize your shopping routine, CryoLog is here to assist you every step of the way.
+
+>Thank you for your interest in CryoLog. We are excited about the journey ahead and hope you will join us in making smart, healthy, and efficient grocery shopping a reality for everyone.
+
+>Happy shopping and stay healthy! 🌟
+
+by JA'AM
