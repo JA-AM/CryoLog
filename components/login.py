@@ -50,24 +50,26 @@ def login(auth, db, cookie_manager):
             background-color: #111111;
             border: 0.1px solid #222e3b2;
             border-radius: 0.5rem;
+            padding: 1em;
         }
         """
         ):
-            st.subheader("Sign in with Google")
-            oauth2 = OAuth2Component(
-                st.secrets['client_id'],
-                st.secrets['client_secret'],
-                "https://accounts.google.com/o/oauth2/v2/auth",
-                "https://oauth2.googleapis.com/token",
-                "https://oauth2.googleapis.com/token",
-                "https://oauth2.googleapis.com/revoke",
-            )
-            result = oauth2.authorize_button(
-                name="Sign in",
-                redirect_uri=st.secrets["redirect_uris"],
-                scope="email profile",
-                key="google"
-            )
+            with st.container():
+                st.subheader("Sign in with Google")
+                oauth2 = OAuth2Component(
+                    st.secrets['client_id'],
+                    st.secrets['client_secret'],
+                    "https://accounts.google.com/o/oauth2/v2/auth",
+                    "https://oauth2.googleapis.com/token",
+                    "https://oauth2.googleapis.com/token",
+                    "https://oauth2.googleapis.com/revoke",
+                )
+                result = oauth2.authorize_button(
+                    name="Sign in",
+                    redirect_uri=st.secrets["redirect_uris"],
+                    scope="email profile",
+                    key="google"
+                )
 
     if login and email and password:
         try:
