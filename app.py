@@ -108,8 +108,8 @@ def home():
                         offering significant benefits for user engagement, healthcare providers, and retail integration,
                         while providing valuable insights into nutritional trends and consumer behavior.
                         """)
-                # TODO add full documentation link
-                st.link_button("Link to Full Documentation", 'https://streamlit.io')
+
+                st.link_button("Link to Full Documentation", 'https://docs.google.com/document/d/1wocwAc723T7vXrriHCnnfn_JbEPEwZsDuWmr5YuYPWc/edit?usp=sharing')
             
             #st.markdown("""<span style='color: #779ecb;'>✦ ✦ ✦ ✦""", unsafe_allow_html=True)
             st.markdown("""**With Cryolog, the journey to a healthier you is simplified, efficient, and enjoyable.
